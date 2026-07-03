@@ -1,0 +1,20 @@
+# Django gitignore
+*.log
+*.pot
+*.py[cod]
+__pycache__/
+local_settings.py
+db.sqlite3
+mydatabase
+.env
+staticfiles/
+venv/
+.venv/
+.idea/
+.vscode/
+*.xlsx
+*.csv
+!investment expense.csv
+!investment income.csv
+!test_expenses.csv
+!test_income.csv

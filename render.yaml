@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: finsight
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn expensetracker.wsgi"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finsight-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: finsight-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: worker
+    name: finsight-worker
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "celery -A expensetracker worker -l info"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finsight-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: finsight-redis
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          type: web
+          name: finsight
+          property: envVar:SECRET_KEY
+
+  - type: redis
+    name: finsight-redis
+    ipAllowList: []
+
+databases:
+  - name: finsight-db
+    databaseName: finsight
+    user: finsight_user

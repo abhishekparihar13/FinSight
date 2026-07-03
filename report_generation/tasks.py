@@ -76,8 +76,9 @@ def generate_report_and_send_email():
             # Clean up generated file
             # os.remove(monthly_report_path)
 
-# Initialize Redis client
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+# Initialize Redis client from environment URL or fallback
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+redis_client = redis.Redis.from_url(redis_url)
 
 # Define a function to schedule the task
 def schedule_report_sending():
