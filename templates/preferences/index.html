@@ -1,0 +1,76 @@
+{% extends 'base.html'%} 
+
+{% block title %}Preferences{% endblock %}
+{% block page_title %}General{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+
+
+    <div class="mb-12">
+        <h5 class="text-xl font-bold text-light mb-6">Expense Limits & Progress</h5>
+        
+        <form action="{% url 'set-daily-expense-limit' %}" method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Daily -->
+            <div class="glass-card p-6 rounded-xl border border-white/5 bg-surface-elevated">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-lg text-light font-medium">Daily Limit</label>
+                    <span class="text-sm text-muted">Current: <b class="tabular-nums text-light">{{daily_expense_limit}}</b></span>
+                </div>
+                <input type="number" name="daily_expense_limit" value="{{daily_expense_limit}}" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] transition-all mb-4">
+                
+                <div class="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                    <div class="bg-primary h-2.5 rounded-full" style="width: {{ daily_pct }}%"></div>
+                </div>
+                <p class="text-xs text-muted text-right">Spent: {{daily_expense|floatformat:2}} / {{daily_expense_limit}} ({{ daily_pct }}%)</p>
+            </div>
+
+            <!-- Weekly -->
+            <div class="glass-card p-6 rounded-xl border border-white/5 bg-surface-elevated">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-lg text-light font-medium">Weekly Limit</label>
+                    <span class="text-sm text-muted">Current: <b class="tabular-nums text-light">{{weekly_expense_limit}}</b></span>
+                </div>
+                <input type="number" name="weekly_expense_limit" value="{{weekly_expense_limit}}" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] transition-all mb-4">
+                
+                <div class="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                    <div class="bg-success h-2.5 rounded-full" style="width: {{ weekly_pct }}%"></div>
+                </div>
+                <p class="text-xs text-muted text-right">Spent: {{weekly_expense|floatformat:2}} / {{weekly_expense_limit}} ({{ weekly_pct }}%)</p>
+            </div>
+
+            <!-- Monthly -->
+            <div class="glass-card p-6 rounded-xl border border-white/5 bg-surface-elevated">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-lg text-light font-medium">Monthly Limit</label>
+                    <span class="text-sm text-muted">Current: <b class="tabular-nums text-light">{{monthly_expense_limit}}</b></span>
+                </div>
+                <input type="number" name="monthly_expense_limit" value="{{monthly_expense_limit}}" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] transition-all mb-4">
+                
+                <div class="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                    <div class="bg-secondary h-2.5 rounded-full" style="width: {{ monthly_pct }}%"></div>
+                </div>
+                <p class="text-xs text-muted text-right">Spent: {{monthly_expense|floatformat:2}} / {{monthly_expense_limit}} ({{ monthly_pct }}%)</p>
+            </div>
+
+            <!-- Yearly -->
+            <div class="glass-card p-6 rounded-xl border border-white/5 bg-surface-elevated">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-lg text-light font-medium">Yearly Limit</label>
+                    <span class="text-sm text-muted">Current: <b class="tabular-nums text-light">{{yearly_expense_limit}}</b></span>
+                </div>
+                <input type="number" name="yearly_expense_limit" value="{{yearly_expense_limit}}" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] transition-all mb-4">
+                
+                <div class="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                    <div class="bg-danger h-2.5 rounded-full" style="width: {{ yearly_pct }}%"></div>
+                </div>
+                <p class="text-xs text-muted text-right">Spent: {{yearly_expense|floatformat:2}} / {{yearly_expense_limit}} ({{ yearly_pct }}%)</p>
+            </div>
+
+            <button type="submit" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25 w-full sm:w-auto">Save Limits</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

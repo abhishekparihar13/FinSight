@@ -1,0 +1,126 @@
+<nav class="h-16 px-6 lg:px-8 border-b border-white/5 bg-surface/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+        <!-- Sidebar Toggles -->
+        <button id="sidebarCollapseDesktop" class="text-muted hover:text-light transition-colors hidden lg:block">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <button id="sidebarCollapseMobile" class="text-muted hover:text-light transition-colors lg:hidden">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <h2 class="text-lg font-semibold text-light hidden sm:block">{% block page_title %}Overview{% endblock page_title %}</h2>
+    </div>
+
+    <div class="flex items-center gap-6">
+        
+        <!-- Notifications -->
+        <div class="relative text-muted hover:text-light cursor-pointer transition-colors group">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            {% if unread_notifications or pending_recurring_expenses %}
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+            {% endif %}
+            
+            <!-- Notifications Dropdown -->
+            <div class="absolute right-0 top-full mt-4 w-72 max-h-96 overflow-y-auto bg-surface-elevated border border-white/5 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div class="px-4 py-3 border-b border-white/5 flex justify-between items-center">
+                    <span class="text-sm font-semibold text-light">Notifications</span>
+                    {% if unread_notifications %}
+                    <a href="{% url 'mark-notifications-read' %}" class="text-xs text-primary hover:text-primary/80">Mark all read</a>
+                    {% endif %}
+                </div>
+                <div class="py-2">
+                    {% for pending in pending_recurring_expenses %}
+                    <div class="px-4 py-3 hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors bg-[#F59E0B]/10">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-sm text-light font-medium flex-1">Pending: {{ pending.description }}</p>
+                            <span class="text-sm font-semibold text-[#F59E0B]">&#8377; {{ pending.amount }}</span>
+                        </div>
+                        <p class="text-xs text-muted mb-3">{{ pending.category }}</p>
+                        <div class="flex justify-end">
+                            <a href="{% url 'dummy_payment' pending.id %}" class="bg-[#10B981]/20 text-[#10B981] hover:bg-[#10B981] hover:text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                                Pay
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% for notification in unread_notifications %}
+                    <div class="px-4 py-3 hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors">
+                        <p class="text-sm text-light mb-1">{{ notification.message }}</p>
+                        <span class="text-xs text-muted">{{ notification.created_at|timesince }} ago</span>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if not unread_notifications and not pending_recurring_expenses %}
+                    <div class="px-4 py-6 text-center text-muted text-sm">
+                        No new notifications
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User section -->
+        <div class="flex items-center gap-3 border-l border-white/10 pl-6 relative group">
+            {% if request.user.is_authenticated %}
+                <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-surface-elevated">
+                    <span class="text-xs font-medium">{{ request.user.username|make_list|first|upper }}</span>
+                </div>
+                <span class="text-sm font-medium hidden sm:block">{{ request.user.username|capfirst }}</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-muted hidden sm:block group-hover:text-light transition-colors"></i>
+
+                <!-- Dropdown -->
+                <div class="absolute right-0 top-full mt-4 w-48 bg-surface-elevated border border-white/5 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+                    <div class="px-4 py-2 border-b border-white/5 mb-2 sm:hidden">
+                        <span class="text-sm font-medium text-light">{{ request.user.username|capfirst }}</span>
+                    </div>
+                    <a href="{% url 'account' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-muted hover:text-light hover:bg-white/5 transition-colors">
+                        <i data-lucide="user" class="w-4 h-4"></i> Profile
+                    </a>
+                    <a href="{% url 'preferences' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-muted hover:text-light hover:bg-white/5 transition-colors">
+                        <i data-lucide="settings" class="w-4 h-4"></i> Settings
+                    </a>
+                    <div class="h-px bg-white/5 my-2"></div>
+                    <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-danger hover:bg-danger/10 transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    </a>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-sm font-medium text-muted hover:text-primary transition-colors">Login</a>
+                <a href="{% url 'register' %}" class="text-sm font-medium px-4 py-1.5 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtnDesktop = document.getElementById('sidebarCollapseDesktop');
+        const toggleBtnMobile = document.getElementById('sidebarCollapseMobile');
+        const sidebarCloseMobile = document.getElementById('sidebarCloseMobile');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (toggleBtnDesktop) {
+            toggleBtnDesktop.addEventListener('click', () => {
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-16');
+            });
+        }
+        
+        if (toggleBtnMobile) {
+            toggleBtnMobile.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            });
+        }
+        
+        const closeSidebar = () => {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        };
+
+        if (sidebarCloseMobile) sidebarCloseMobile.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+    });
+</script>

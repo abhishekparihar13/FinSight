@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Import Investments{% endblock %}
+{% block page_title %}Bulk Import Investments{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-[#1A1A24] border border-white/5 rounded-lg px-6 py-4 mb-6">
+        <ol class="flex text-sm text-muted">
+            <li>
+                <a href="{% url 'investments' %}" class="text-primary hover:text-white transition-colors">Investments</a>
+            </li>
+            <li class="mx-2">/</li>
+            <li class="text-light" aria-current="page">Bulk Import</li>
+        </ol>
+    </nav>
+
+    <!-- Main Card -->
+    <div class="bg-[#0A0A0F] border border-white/10 rounded-lg p-6 md:p-8">
+        <div class="mb-8 border-b border-white/5 pb-6">
+            <h2 class="text-xl font-bold text-light mb-2">Import Investments</h2>
+            <p class="text-muted">Upload a CSV or Excel file to bulk import multiple investments at once.</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mb-8 bg-[#1A1A24] border border-primary/20 rounded-lg p-5">
+            <h3 class="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4"></i> File Requirements
+            </h3>
+            <ul class="text-sm text-muted space-y-2 list-disc list-inside">
+                <li>File must be in <span class="text-light font-medium">.csv</span>, <span class="text-light font-medium">.xlsx</span>, or <span class="text-light font-medium">.xls</span> format.</li>
+                <li>The first row must contain column headers.</li>
+                <li>Required columns: <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">name</span>, <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">amount_invested</span>, <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">date</span>.</li>
+                <li>Optional columns: <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">investment_type</span>, <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">returns</span>, <span class="text-light font-medium bg-white/5 px-1.5 py-0.5 rounded">status</span>.</li>
+                <li>Date must be in <span class="text-light font-medium">YYYY-MM-DD</span> format.</li>
+            </ul>
+        </div>
+
+        <form action="{% url 'bulk_import_investments' %}" method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="flex flex-col space-y-2">
+                <label for="file" class="text-sm font-medium text-light mb-2">Select File</label>
+                <div class="relative group">
+                    <input type="file" id="file" name="file" accept=".csv,.xlsx,.xls" required
+                           class="w-full bg-[#1A1A24] border border-dashed border-white/20 rounded-lg py-12 px-4 text-center text-light focus:outline-none focus:border-[#8B5CF6] transition-all cursor-pointer file:hidden" />
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-muted group-hover:text-light transition-colors">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 mb-2"></i>
+                        <span class="font-medium" id="file-name">Click to browse or drag and drop</span>
+                        <span class="text-xs mt-1">CSV, XLSX up to 5MB</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex gap-4">
+                <button type="submit" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-2.5 rounded-md font-medium transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
+                    <i data-lucide="upload" class="w-4 h-4"></i> Upload & Import
+                </button>
+                <a href="{% url 'investments' %}" class="bg-[#1A1A24] border border-white/5 hover:bg-white/5 text-light px-8 py-2.5 rounded-md font-medium transition-all text-center">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('file').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        if (fileName) {
+            document.getElementById('file-name').textContent = fileName;
+        } else {
+            document.getElementById('file-name').textContent = 'Click to browse or drag and drop';
+        }
+    });
+</script>
+{% endblock %}

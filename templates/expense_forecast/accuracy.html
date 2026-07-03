@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Model Accuracy Dashboard{% endblock %}
+{% block page_title %}Model Accuracy Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- ============================================================
+         ML MODEL ACCURACY DASHBOARD
+         ============================================================ -->
+    <div class="mt-8 space-y-6">
+      <div class="flex items-center gap-3 mb-2">
+        <i data-lucide="cpu" class="w-6 h-6 text-primary"></i>
+        <h2 class="text-xl font-semibold text-light">Model Accuracy Dashboard</h2>
+      </div>
+
+      <!-- ── Row 1: Two model header cards ── -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- ARIMA Card -->
+        <div class="bg-surface-elevated rounded-xl border border-white/5 p-5 shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="activity" class="w-5 h-5 text-secondary"></i>
+              <span class="font-semibold text-light">ARIMA Forecast Model</span>
+            </div>
+            <span class="text-xs text-muted bg-white/5 px-2 py-1 rounded-full">Order {{ arima_order }}</span>
+          </div>
+          {% if arima_error %}
+            <p class="text-danger text-sm">Error: {{ arima_error }}</p>
+          {% else %}
+            <!-- Accuracy badge -->
+            <div class="flex items-center gap-3 mb-4">
+              {% if arima_accuracy_pct is not None %}
+                <div class="text-4xl font-black 
+                  {% if arima_accuracy_pct >= 80 %}text-success
+                  {% elif arima_accuracy_pct >= 60 %}text-warning
+                  {% else %}text-danger{% endif %}">
+                  {{ arima_accuracy_pct }}%
+                </div>
+                <span class="text-sm text-muted">Hold-out accuracy<br>(100 - MAPE)</span>
+              {% else %}
+                <div class="text-2xl font-bold text-muted">N/A</div>
+                <span class="text-sm text-muted">Need 21+ days of data</span>
+              {% endif %}
+            </div>
+            <!-- Metrics grid -->
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">MAE (₹)</p>
+                <p class="text-light font-semibold">{{ arima_mae|default:"—" }}</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">RMSE (₹)</p>
+                <p class="text-light font-semibold">{{ arima_rmse|default:"—" }}</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">MAPE</p>
+                <p class="text-light font-semibold">{% if arima_mape is not None %}{{ arima_mape }}%{% else %}—{% endif %}</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">AIC / BIC</p>
+                <p class="text-light font-semibold text-xs">{{ arima_aic }} / {{ arima_bic }}</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3 col-span-2">
+                <p class="text-muted text-xs mb-1">Residual Autocorrelation (lag-1)</p>
+                <div class="flex items-center gap-2">
+                  <div class="flex-1 bg-white/10 rounded-full h-2">
+                    <div class="h-2 rounded-full 
+                      {% if arima_resid_acf1|floatformat:2 < '0.10' %}bg-success
+                      {% elif arima_resid_acf1|floatformat:2 < '0.30' %}bg-warning
+                      {% else %}bg-danger{% endif %}"
+                      style="width: {% widthratio arima_resid_acf1|default:0 1 100 %}%">
+                    </div>
+                  </div>
+                  <span class="text-light text-xs font-mono">{{ arima_resid_acf1|default:"—" }}</span>
+                </div>
+                <p class="text-muted text-xs mt-1">Lower = better model fit</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3 col-span-2">
+                <p class="text-muted text-xs mb-1">Training Data</p>
+                <p class="text-light font-semibold">{{ arima_training_days }} days of expense history</p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- RandomForest Card -->
+        <div class="bg-surface-elevated rounded-xl border border-white/5 p-5 shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="git-branch" class="w-5 h-5 text-primary"></i>
+              <span class="font-semibold text-light">Random Forest Classifier</span>
+            </div>
+            <span class="text-xs text-muted bg-white/5 px-2 py-1 rounded-full">TF-IDF + RF</span>
+          </div>
+          {% if rf_error %}
+            <p class="text-danger text-sm">Error: {{ rf_error }}</p>
+          {% else %}
+            <!-- Accuracy badge -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="text-4xl font-black 
+                {% if rf_accuracy >= 80 %}text-success
+                {% elif rf_accuracy >= 60 %}text-warning
+                {% else %}text-danger{% endif %}">
+                {{ rf_accuracy }}%
+              </div>
+              <span class="text-sm text-muted">Test set accuracy<br>(20% hold-out)</span>
+            </div>
+            <!-- Accuracy visual bar -->
+            <div class="mb-4">
+              <div class="flex justify-between text-xs text-muted mb-1">
+                <span>Accuracy</span><span>{{ rf_accuracy }}%</span>
+              </div>
+              <div class="w-full bg-white/10 rounded-full h-3">
+                <div class="h-3 rounded-full transition-all duration-700
+                  {% if rf_accuracy >= 80 %}bg-success
+                  {% elif rf_accuracy >= 60 %}bg-warning
+                  {% else %}bg-danger{% endif %}"
+                  style="width: {{ rf_accuracy }}%"></div>
+              </div>
+            </div>
+            <!-- Stats grid -->
+            <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">Weighted F1</p>
+                <p class="text-light font-semibold">{{ rf_weighted_f1 }}%</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">Macro F1</p>
+                <p class="text-light font-semibold">{{ rf_macro_f1 }}%</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">Total Samples</p>
+                <p class="text-light font-semibold">{{ rf_total_samples }}</p>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <p class="text-muted text-xs mb-1">Categories</p>
+                <p class="text-light font-semibold">{{ rf_num_categories }}</p>
+              </div>
+            </div>
+            <!-- Retrain button -->
+            <button id="retrainBtn" onclick="retrainModel()"
+              class="w-full flex items-center justify-center gap-2 bg-primary/20 hover:bg-primary/30 
+                     text-primary border border-primary/30 rounded-lg py-2.5 text-sm font-medium 
+                     transition-colors cursor-pointer">
+              <i data-lucide="refresh-cw" class="w-4 h-4" id="retrainIcon"></i>
+              <span id="retrainText">Retrain Model</span>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── Row 2: Per-category F1 bar chart (RF) ── -->
+      {% if not rf_error and rf_per_category %}
+      <div class="bg-surface-elevated rounded-xl border border-white/5 p-5 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="bar-chart-2" class="w-5 h-5 text-primary"></i>
+          <h3 class="font-semibold text-light">Per-Category Performance (F1 Score)</h3>
+        </div>
+        <div class="relative h-64">
+          <canvas id="categoryF1Chart"></canvas>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ── Row 3: Confusion Matrix ── -->
+      {% if not rf_error and cm_list %}
+      <div class="bg-surface-elevated rounded-xl border border-white/5 p-5 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="grid" class="w-5 h-5 text-secondary"></i>
+          <h3 class="font-semibold text-light">Confusion Matrix</h3>
+          <span class="text-xs text-muted ml-auto">Darker = more predictions</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="text-xs border-collapse w-full" id="confusionMatrix">
+            <!-- Rendered by JS below -->
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    <!-- END ML ACCURACY DASHBOARD -->
+
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Common Chart.js Defaults for Dark Mode
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // ── ML ACCURACY CHARTS ──
+    const rfPerCategory = {{ rf_per_category_json|safe|default:"[]" }};
+    const cmList = {{ cm_list|safe|default:"[]" }};
+    const cmLabels = {{ cm_labels|safe|default:"[]" }};
+
+    // Per-category F1 Chart
+    if (rfPerCategory && rfPerCategory.length > 0) {
+      const f1Ctx = document.getElementById('categoryF1Chart');
+      if (f1Ctx) {
+        const cats = rfPerCategory.map(d => d.category);
+        const f1s = rfPerCategory.map(d => d.f1);
+        const precs = rfPerCategory.map(d => d.precision);
+        const recalls = rfPerCategory.map(d => d.recall);
+        new Chart(f1Ctx, {
+          type: 'bar',
+          data: {
+            labels: cats,
+            datasets: [
+              { label: 'F1 Score', data: f1s, backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 4 },
+              { label: 'Precision', data: precs, backgroundColor: 'rgba(16,185,129,0.5)', borderRadius: 4 },
+              { label: 'Recall', data: recalls, backgroundColor: 'rgba(245,158,11,0.5)', borderRadius: 4 },
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#94A3B8', boxWidth: 12 } } },
+            scales: {
+              x: { ticks: { color: '#64748B', maxRotation: 45 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+              y: { min: 0, max: 100, ticks: { color: '#64748B', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            }
+          }
+        });
+      }
+    }
+
+    // Confusion Matrix heatmap
+    if (cmList && cmLabels && cmList.length > 0 && cmLabels.length > 0) {
+      const table = document.getElementById('confusionMatrix');
+      if (table) {
+        const maxVal = Math.max(...cmList.flat());
+        let html = '<tr><th class="p-1 text-muted text-xs">Actual \\ Pred</th>';
+        cmLabels.forEach(l => {
+          html += `<th class="p-1 text-muted text-xs whitespace-nowrap" style="writing-mode:vertical-rl;transform:rotate(180deg);max-width:30px">${l}</th>`;
+        });
+        html += '</tr>';
+        cmList.forEach((row, i) => {
+          html += `<tr><td class="p-1 text-muted text-xs font-medium whitespace-nowrap pr-2">${cmLabels[i]}</td>`;
+          row.forEach((val, j) => {
+            const intensity = maxVal > 0 ? val / maxVal : 0;
+            const bg = i === j
+              ? `rgba(16,185,129,${0.15 + intensity * 0.7})`
+              : val > 0 ? `rgba(239,68,68,${0.1 + intensity * 0.6})` : 'transparent';
+            const textColor = val > 0 ? '#E2E8F0' : '#475569';
+            html += `<td class="p-1 text-center font-mono text-xs rounded" style="background:${bg};color:${textColor};min-width:28px">${val}</td>`;
+          });
+          html += '</tr>';
+        });
+        table.innerHTML = html;
+      }
+    }
+});
+
+// Retrain function
+function retrainModel() {
+  const btn = document.getElementById('retrainBtn');
+  const icon = document.getElementById('retrainIcon');
+  const text = document.getElementById('retrainText');
+  if (btn) btn.disabled = true;
+  if (text) text.textContent = 'Retraining...';
+  if (icon) icon.style.animation = 'spin 1s linear infinite';
+  
+  fetch("{% url 'retrain_model' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (text) text.textContent = data.status === 'success' ? '✓ Retrained!' : '✗ Failed';
+    if (icon) icon.style.animation = '';
+    setTimeout(() => { 
+        if (text) text.textContent = 'Retrain Model'; 
+        if (btn) btn.disabled = false; 
+    }, 2500);
+  })
+  .catch(() => { 
+      if (text) text.textContent = '✗ Error'; 
+      if (btn) btn.disabled = false; 
+      if (icon) icon.style.animation = '';
+  });
+}
+</script>
+{% endblock js %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %} 
+
+{% block title %}Add Investment{% endblock %}
+{% block page_title %}Add Investment{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-[#1A1A24] border border-white/5 rounded-lg px-6 py-4 mb-6">
+        <ol class="flex text-sm text-muted">
+            <li>
+                <a href="{% url 'investments' %}" class="text-primary hover:text-white transition-colors">Investments</a>
+            </li>
+            <li class="mx-2">/</li>
+            <li class="text-light" aria-current="page">Add Investment</li>
+        </ol>
+    </nav>
+
+    <!-- Main Form Card -->
+    <div class="bg-[#0A0A0F] border border-white/10 rounded-lg p-6 md:p-8">
+        <form action="{% url 'add_investment' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="force_save" id="force_save" value="0">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Name -->
+                <div class="flex flex-col space-y-2">
+                    <label for="name" class="text-sm font-medium text-light">Investment Name</label>
+                    <input type="text" id="name" name="name" value="{{values.name}}" placeholder="e.g. Stocks - Jio Industries" required
+                           class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all" />
+                </div>
+
+                <!-- Type -->
+                <div class="flex flex-col space-y-2">
+                    <label for="investment_type" class="text-sm font-medium text-light">Type</label>
+                    <select id="investment_type" name="investment_type" required
+                            class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all appearance-none cursor-pointer custom-select">
+                        {% for val, label in types %}
+                        <option value="{{val}}" {% if values.investment_type == val %}selected{% endif %}>{{label}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Amount Invested -->
+                <div class="flex flex-col space-y-2">
+                    <label for="amount_invested" class="text-sm font-medium text-light">Amount Invested</label>
+                    <input type="number" step="0.01" id="amount_invested" name="amount_invested" value="{{values.amount_invested}}" required
+                           class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all" />
+                </div>
+
+                <!-- Returns -->
+                <div class="flex flex-col space-y-2">
+                    <label for="returns" class="text-sm font-medium text-light">Returns (Current Value or Final Return)</label>
+                    <input type="number" step="0.01" id="returns" name="returns" value="{{values.returns|default:'0'}}" 
+                           class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all" />
+                </div>
+
+                <!-- Date -->
+                <div class="flex flex-col space-y-2">
+                    <label for="date" class="text-sm font-medium text-light">Date of Investment</label>
+                    <input type="date" id="date" name="date" value="{{values.date}}" required
+                           class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]" />
+                </div>
+
+                <!-- Status -->
+                <div class="flex flex-col space-y-2">
+                    <label for="status" class="text-sm font-medium text-light">Status</label>
+                    <select id="status" name="status" onchange="toggleSellDate()"
+                            class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all appearance-none cursor-pointer custom-select">
+                        <option value="Active" {% if values.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Sold" {% if values.status == 'Sold' %}selected{% endif %}>Sold</option>
+                    </select>
+                </div>
+                
+                <!-- Sell Date (Hidden by default) -->
+                <div class="flex flex-col space-y-2" id="sell_date_container" style="display: none;">
+                    <label for="sell_date" class="text-sm font-medium text-light">Sell Date</label>
+                    <input type="date" id="sell_date" name="sell_date" value="{{values.sell_date}}"
+                           class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]" />
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="flex flex-col space-y-2 mt-6">
+                <label for="notes" class="text-sm font-medium text-light">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="3"
+                          class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all">{{values.notes}}</textarea>
+            </div>
+
+            <div class="pt-4 flex gap-4">
+                <input type="submit" value="Save Investment" 
+                       class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-2.5 rounded-md font-medium transition-all shadow-lg shadow-primary/25 cursor-pointer" />
+                <a href="{% url 'investments' %}" class="bg-[#1A1A24] border border-white/5 hover:bg-white/5 text-light px-8 py-2.5 rounded-md font-medium transition-all text-center">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Warning Modal Template (same structure as expenses) -->
+{% if messages %}
+    {% for message in messages %}
+        {% if 'Warning:' in message.message %}
+        <div id="warningModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="bg-[#1A1A24] border border-warning/20 rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div class="p-6">
+                    <div class="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mb-4 border border-warning/20">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-warning"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Limit Warning</h3>
+                    <p class="text-muted mb-6">{{ message.message }}</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeWarningModal()" class="flex-1 px-4 py-2 bg-[#0A0A0F] hover:bg-white/5 text-white rounded-lg transition-colors font-medium border border-white/10">
+                            Cancel
+                        </button>
+                        <button type="button" onclick="confirmWarning()" class="flex-1 px-4 py-2 bg-warning hover:bg-warning/90 text-warning-foreground rounded-lg transition-colors font-medium shadow-lg shadow-warning/20">
+                            Proceed Anyway
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<style>
+    /* Custom select arrow for dark theme */
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+</style>
+
+<script>
+    function toggleSellDate() {
+        const status = document.getElementById('status').value;
+        const sellDateContainer = document.getElementById('sell_date_container');
+        const sellDateInput = document.getElementById('sell_date');
+        
+        if (status === 'Sold') {
+            sellDateContainer.style.display = 'flex';
+            sellDateInput.required = true;
+        } else {
+            sellDateContainer.style.display = 'none';
+            sellDateInput.required = false;
+        }
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSellDate();
+    });
+
+    function closeWarningModal() {
+        document.getElementById('warningModal').style.display = 'none';
+    }
+
+    function confirmWarning() {
+        document.getElementById('force_save').value = '1';
+        document.forms[0].submit();
+    }
+</script>
+{% endblock %}

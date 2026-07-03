@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Expenses{% endblock %}
+
+{% block page_title %}Expenses{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 class="text-2xl lg:text-3xl font-bold text-light">My Expenses</h1>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'bulk-import-expenses' %}" class="flex items-center gap-2 bg-surface-elevated border border-white/10 hover:border-white/20 text-light px-5 py-2.5 rounded-lg font-medium transition-all">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                Import
+            </a>
+            <a href="{% url 'add-expenses' %}" class="flex items-center gap-2 bg-gradient-to-r from-primary to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                Add Expense
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Strip -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="glass-card p-6 flex items-center justify-between group hover-glow transition-all">
+            <div>
+                <p class="text-sm font-medium text-muted mb-1">Total This Month</p>
+                <h3 class="text-2xl font-bold text-light tabular-nums"><span class="count-up">&#8377; {{ total_this_month|floatformat:"2"|default:"0.00" }}</span></h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+            </div>
+        </div>
+        <div class="glass-card p-6 flex items-center justify-between group hover-glow transition-all">
+            <div>
+                <p class="text-sm font-medium text-muted mb-1">Highest Category</p>
+                <h3 class="text-2xl font-bold text-light">{{ highest_category|default:"N/A" }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-danger/20 flex items-center justify-center text-danger">
+                <i data-lucide="trending-up" class="w-6 h-6"></i>
+            </div>
+        </div>
+        <div class="glass-card p-6 flex items-center justify-between group hover-glow transition-all">
+            <div>
+                <p class="text-sm font-medium text-muted mb-1">Total Entries</p>
+                <h3 class="text-2xl font-bold text-light count-up">{{ expenses.count|default:"0" }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+                <i data-lucide="list" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Controls -->
+    <div class="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+        <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted"></i>
+            <input type="text" id="searchField" placeholder="Search expenses..." class="w-full bg-surface-elevated border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- Delete Selected Button (hidden by default) -->
+            <button id="deleteSelectedBtn" type="button" onclick="confirmDelete()" class="hidden items-center gap-2 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 px-4 py-2.5 rounded-lg font-medium transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Delete</span>
+            </button>
+            
+            <button type="button" onclick="document.getElementById('filterPanel').classList.toggle('hidden')" class="relative flex items-center gap-2 bg-surface-elevated border border-white/10 hover:bg-white/5 text-light px-4 py-2.5 rounded-lg font-medium transition-all">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Filter</span>
+                {% if active_filters %}
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background"></span>
+                {% endif %}
+            </button>
+
+            <form id="filterSortForm" method="get" class="flex items-center gap-2 w-full sm:w-auto">
+                <!-- Keep filter values when sorting -->
+                <input type="hidden" name="category" value="{{ filter_category|default:'' }}">
+                <input type="hidden" name="date_from" value="{{ filter_date_from|default:'' }}">
+                <input type="hidden" name="date_to" value="{{ filter_date_to|default:'' }}">
+                <input type="hidden" name="amount_min" value="{{ filter_amount_min|default:'' }}">
+                <input type="hidden" name="amount_max" value="{{ filter_amount_max|default:'' }}">
+                
+                <div class="relative w-full sm:w-auto">
+                    <select name="sort" onchange="this.form.submit()" class="bg-surface-elevated border border-white/10 rounded-lg py-2.5 pl-4 pr-10 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-full sm:w-auto appearance-none cursor-pointer">
+                        <option value="">Sort By</option>
+                        <option value="date_desc" {% if sort_order == 'date_desc' %}selected{% endif %}>Date (Newest)</option>
+                        <option value="date_asc" {% if sort_order == 'date_asc' %}selected{% endif %}>Date (Oldest)</option>
+                        <option value="amount_desc" {% if sort_order == 'amount_desc' %}selected{% endif %}>Amount (Highest)</option>
+                        <option value="amount_asc" {% if sort_order == 'amount_asc' %}selected{% endif %}>Amount (Lowest)</option>
+                    </select>
+                    <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div id="filterPanel" class="{% if not active_filters %}hidden{% endif %} glass-card p-4 sm:p-6 mb-6">
+        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <input type="hidden" name="sort" value="{{ sort_order|default:'' }}">
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Category</label>
+                <select name="category" class="w-full bg-surface-elevated border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.category }}" {% if filter_category == cat.category %}selected{% endif %}>{{ cat.category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Date Range</label>
+                <div class="flex items-center gap-2">
+                    <input type="date" name="date_from" value="{{ filter_date_from|default:'' }}" class="w-full bg-surface-elevated border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all [color-scheme:dark]">
+                    <span class="text-muted">to</span>
+                    <input type="date" name="date_to" value="{{ filter_date_to|default:'' }}" class="w-full bg-surface-elevated border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all [color-scheme:dark]">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Amount Range</label>
+                <div class="flex items-center gap-2">
+                    <input type="number" step="0.01" name="amount_min" placeholder="Min" value="{{ filter_amount_min|default:'' }}" class="w-full bg-surface-elevated border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                    <span class="text-muted">-</span>
+                    <input type="number" step="0.01" name="amount_max" placeholder="Max" value="{{ filter_amount_max|default:'' }}" class="w-full bg-surface-elevated border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                </div>
+            </div>
+            
+            <div class="flex items-end gap-2 md:col-start-4 justify-end">
+                <a href="?" class="px-4 py-2 rounded-lg text-muted hover:text-light transition-colors text-sm font-medium">Clear</a>
+                <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- {% include 'partials/_messages.html' %} -->
+
+    {% if expenses.count %}
+        <form id="bulkDeleteForm" method="post" action="{% url 'bulk-delete-expenses' %}">
+        {% csrf_token %}
+        
+        <!-- List Header / Select All -->
+        <div class="flex items-center gap-3 px-2 py-2 mb-2">
+            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" class="w-4 h-4 rounded border-white/20 bg-surface-elevated text-primary focus:ring-primary focus:ring-offset-background transition-all">
+            <label for="selectAll" class="text-sm text-muted font-medium cursor-pointer">Select All</label>
+        </div>
+
+        <!-- Card List Container -->
+        <div class="app-table space-y-3">
+            {% for expense in page_obj %}
+            <div class="glass-card p-4 hover:bg-white/5 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <input type="checkbox" name="selected_ids" value="{{ expense.id }}" onchange="updateDeleteButton()" class="expense-checkbox w-4 h-4 rounded border-white/20 bg-surface-elevated text-primary focus:ring-primary focus:ring-offset-background transition-all">
+                    <div class="w-10 h-10 rounded-full bg-surface-elevated border border-white/5 flex items-center justify-center text-lg shadow-inner">
+                        🏷️
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-light text-base">{{ expense.description }}</h4>
+                        <div class="flex items-center gap-2 text-sm text-muted mt-1">
+                            <span class="px-2 py-0.5 rounded text-xs font-medium bg-white/5 border border-white/5">{{ expense.category }}</span>
+                            <span>•</span>
+                            <span>{{ expense.date }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between sm:justify-end gap-4 sm:w-1/3">
+                    <div class="text-right">
+                        <span class="font-bold text-danger tabular-nums block">&#8377; {{ expense.amount }}</span>
+                    </div>
+                    <!-- Using Edit button as ghost icon -->
+                    <a href="{% url 'expense-edit' expense.id %}" class="w-8 h-8 rounded flex items-center justify-center text-muted hover:text-primary hover:bg-primary/10 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <p class="no-results text-center text-muted py-8" style="display: none;">No expenses found matching your search.</p>
+        
+        <!-- Search Results Container -->
+        <div class="table-output space-y-3" style="display: none;">
+            <div class="table-body space-y-3"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5 pt-6">
+            <span class="text-sm text-muted">Showing page <span class="text-light font-medium">{{ page_obj.number }}</span> of <span class="text-light font-medium">{{ page_obj.paginator.num_pages }}</span></span>
+            <div class="flex items-center gap-1">
+                {% if page_obj.has_previous %}
+                <a href="?{{ filter_query }}&page=1" class="w-8 h-8 flex items-center justify-center rounded bg-surface-elevated text-muted hover:bg-white/10 hover:text-light transition-colors" title="First Page">
+                    <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                </a>
+                <a href="?{{ filter_query }}&page={{ page_obj.previous_page_number }}" class="w-8 h-8 flex items-center justify-center rounded bg-surface-elevated text-muted hover:bg-white/10 hover:text-light transition-colors" title="Previous Page">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </a>
+                {% endif %}
+                
+                <span class="px-4 py-1.5 rounded bg-primary/20 text-primary font-medium text-sm">{{ page_obj.number }}</span>
+                
+                {% if page_obj.has_next %}
+                <a href="?{{ filter_query }}&page={{ page_obj.next_page_number }}" class="w-8 h-8 flex items-center justify-center rounded bg-surface-elevated text-muted hover:bg-white/10 hover:text-light transition-colors" title="Next Page">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+                <a href="?{{ filter_query }}&page={{ page_obj.paginator.num_pages }}" class="w-8 h-8 flex items-center justify-center rounded bg-surface-elevated text-muted hover:bg-white/10 hover:text-light transition-colors" title="Last Page">
+                    <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        </form>
+    {% else %}
+        <!-- Empty State -->
+        <div class="glass-card p-12 flex flex-col items-center justify-center text-center mt-8">
+            <div class="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center text-muted mb-4 border border-white/5">
+                <i data-lucide="inbox" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold text-light mb-2">No Expenses Yet</h3>
+            <p class="text-muted mb-6 max-w-sm">You haven't recorded any expenses. Add your first expense to start tracking.</p>
+            <a href="{% url 'add-expenses' %}" class="bg-gradient-to-r from-primary to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25">
+                Add Expense
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.expense-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+        updateDeleteButton();
+    }
+
+    function updateDeleteButton() {
+        const checkboxes = document.querySelectorAll('.expense-checkbox');
+        const deleteBtn = document.getElementById('deleteSelectedBtn');
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        
+        if (anyChecked) {
+            deleteBtn.classList.remove('hidden');
+            deleteBtn.classList.add('flex');
+        } else {
+            deleteBtn.classList.add('hidden');
+            deleteBtn.classList.remove('flex');
+            document.getElementById('selectAll').checked = false;
+        }
+    }
+
+    function confirmDelete() {
+        const checkboxes = document.querySelectorAll('.expense-checkbox:checked');
+        if (checkboxes.length > 0) {
+            if (confirm(`Are you sure you want to delete ${checkboxes.length} selected expense(s)?`)) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        }
+    }
+</script>
+<script src="{% static 'js/searchExpenses.js' %}"></script>
+{% endblock content %}

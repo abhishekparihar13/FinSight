@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Account Details{% endblock %}
+{% block page_title %}Account{% endblock %}
+
+{% block css %}
+<style>
+    /* Styling for Django form inputs within the wrapper */
+    .django-form-input-wrapper input {
+        width: 100%;
+        background-color: #1A1A24;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.5rem;
+        padding: 0.625rem 1rem;
+        color: #F8FAFC;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+    }
+    .django-form-input-wrapper input:focus {
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 1px #8B5CF6;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    
+
+
+    <div class="flex flex-col lg:flex-row gap-12 mt-4">
+        <!-- Left Column: Update Profile -->
+        <div class="w-full lg:w-1/2">
+            <h3 class="text-2xl lg:text-3xl font-medium text-light mb-10">Welcome {{request.user.username|capfirst}} !</h3>
+            
+            <form action="" method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    {% for fm in form %}
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+                        <div class="w-full sm:w-1/3 text-md font-medium text-muted">
+                            {{fm.label_tag}}
+                        </div>
+                        <div class="w-full sm:w-2/3">
+                            <div class="django-form-input-wrapper w-full">
+                                {{fm}}
+                            </div>
+                            {% if fm.errors %}
+                            <span class="text-danger text-xs mt-1 block">{{fm.errors|striptags}}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="pt-6">
+                    <input type="submit" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25 cursor-pointer" value="Update">
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column: Add Income Sources -->
+        <div class="w-full lg:w-1/2 lg:pl-12 lg:border-l border-white/5 pt-16 lg:pt-0">
+            <div class="max-w-md">
+                <h3 class="text-lg font-medium text-light mb-4">Add Income Sources :</h3>
+                
+                <form action="{%url 'addSource'%}" method="POST" class="mb-8">
+                    {% csrf_token %}
+                    <div class="flex flex-col sm:flex-row gap-0">
+                        <input type="text" placeholder="Source" name="Source" class="w-full sm:flex-1 bg-[#1A1A24] border border-white/10 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all placeholder:text-muted/70">
+                        <button type="submit" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-6 py-2.5 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg font-medium transition-all">Submit</button>
+                    </div>
+                </form>
+    
+                <div class="space-y-2">
+                    <ul class="list-disc pl-5 space-y-3 text-light">
+                        {% for source in sources %}
+                        <li class="flex items-center gap-2">
+                            <span class="text-light text-base">{{source}}</span> 
+                            <a href="{%url 'deleteSource' source.id%}" class="text-[#06B6D4] hover:text-white transition-colors text-sm ml-2">Delete</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

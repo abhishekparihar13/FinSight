@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSight Report</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8B5CF6;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #8B5CF6;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .report-title {
+            font-size: 20px;
+            color: #555555;
+            margin-top: 5px;
+        }
+        .date-range {
+            font-size: 12px;
+            color: #777777;
+            margin-top: 10px;
+        }
+        h2 {
+            color: #444444;
+            font-size: 18px;
+            border-left: 4px solid #8B5CF6;
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+        }
+        th {
+            background-color: #F3F4F6;
+            font-weight: 600;
+            color: #374151;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #F9FAFB;
+        }
+        .summary-box {
+            background-color: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 30px;
+        }
+        .summary-box table {
+            margin-bottom: 0;
+        }
+        .summary-box th, .summary-box td {
+            border: none;
+            padding: 8px 12px;
+            background-color: transparent;
+        }
+        .summary-box tr:nth-child(even) {
+            background-color: transparent;
+        }
+        .total-row {
+            font-weight: bold;
+            color: #111827;
+        }
+        .status-positive {
+            color: #10B981;
+            font-weight: bold;
+        }
+        .status-neutral {
+            color: #F59E0B;
+            font-weight: bold;
+        }
+        .status-negative {
+            color: #EF4444;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="header" style="text-align: center;">
+        {% if logo_path %}
+        <img src="{{ logo_path }}" alt="FinSight Logo" style="height: 50px; margin-bottom: 10px;">
+        {% else %}
+        <h1 class="logo">FinSight</h1>
+        {% endif %}
+        <div class="report-title">Financial Report</div>
+        {% if start_date and end_date %}
+        <div class="date-range">Period: {{ start_date }} to {{ end_date }}</div>
+        {% endif %}
+    </div>
+
+    {% if incomes %}
+    <h2>Income Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Source</th>
+                <th class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for income in incomes %}
+            <tr>
+                <td>{{ income.date }}</td>
+                <td>{{ income.source }}</td>
+                <td class="text-right">{{ income.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if expenses %}
+    <h2>Expense Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.date }}</td>
+                <td>{{ expense.category }}</td>
+                <td class="text-right">{{ expense.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if expenses_by_category %}
+    <h2>Expenses by Category</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th class="text-right">Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in expenses_by_category %}
+            <tr>
+                <td>{{ item.category }}</td>
+                <td class="text-right">{{ item.total_amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if total_income is not None and total_expense is not None %}
+    <div class="summary-box">
+        <h2 style="margin-top: 0;">Summary</h2>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Total Income:</td>
+                    <td class="text-right">{{ total_income|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Total Expenses:</td>
+                    <td class="text-right">{{ total_expense|floatformat:2 }}</td>
+                </tr>
+                <tr class="total-row" style="border-top: 2px solid #D1D5DB;">
+                    <td>Total Savings:</td>
+                    <td class="text-right">{{ savings|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td class="text-right">
+                        {% if savings > 0 %}
+                        <span class="status-positive">You saved money this period.</span>
+                        {% elif savings == 0 %}
+                        <span class="status-neutral">Your income and expenses balanced perfectly.</span>
+                        {% else %}
+                        <span class="status-negative">You exceeded your expenses than your income this period.</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</body>
+</html>

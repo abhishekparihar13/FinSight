@@ -1,0 +1,594 @@
+description,category,clean_description
+banana,food,banana
+biscuit,food,biscuit
+books,education,books
+bread,food,bread
+breakfast,food,breakfast
+brownie,food,brownie
+brunch,food,brunch
+bun,food,bun
+cakepark,food,cakepark
+car payment,transportation,car payment
+car wash,transportation,car wash
+chocolate ,food,chocolate
+clothes,shopping,clothes
+clothing purchase,shopping,clothing purchase
+coconut water ,food,coconut water
+coffee ,food,coffee
+concerts,entertainment,concerts
+corn,food,corn
+creamstone,food,creamstone
+dairy milk,food,dairy milk
+dentist,health,dentist
+dinner,food,dinner
+doctor,health,doctor
+drinks,food,drinks
+eggs,food,eggs
+electricity bill,utilities,electricity bill
+entertainment,entertainment,entertainment
+eye glasses,health,eye glasses
+five star,food,five star
+fruit,food,fruit
+gas station,transportation,gas station
+gasoline,fuel,gasoline
+good soup,food,good soup
+grocery Shopping,groceries,grocery shopping
+gym,fitness,gym
+haircut,personal care,haircut
+horlicks ,food,horlicks
+hospital,health,hospital
+ice cream,food,ice cream
+internet bill,utilities,internet bill
+ketch up,food,ketch
+kfc,food,kfc
+lemon tea ,food,lemon tea
+lunch,food,lunch
+manicure,personal care,manicure
+mcdonald's ,food,mcdonald
+medical ,health,medical
+milk,food,milk
+momos,food,momos
+mortage,housing,mortage
+movie tickets,entertainment,movie tickets
+pani poori,food,pani poori
+panipuri,food,panipuri
+parking,transportation,parking
+parotta,food,parotta
+pedicure,personal care,pedicure
+pepsi,food,pepsi
+phone bill,utilities,phone bill
+pizza,food,pizza
+public transportation,transportation,public transportation
+puffs,food,puffs
+ramen with gobi,food,ramen gobi
+random stuff for drinks,food,random stuff drinks
+rent  ,housing,rent
+rent payment,housing,rent payment
+restaurant bill,dining,restaurant bill
+shawarma,food,shawarma
+shoes,personal care,shoes
+side dishes,food,side dishes
+snack,food,snack
+snacks,food,snacks
+subway fare,transportation,subway fare
+tamen,food,tamen
+tea lights,food,tea lights
+tolls,transportation,tolls
+travel,transportation,travel
+uber,transportation,uber
+vacations,travel,vacations
+vadapaav,food,vadapaav
+vegetables,food,vegetables
+water,food,water
+meal,food,meal
+zomato,food,zomato
+metro,transportation,metro
+auto,transportation,auto
+bus ticket,transportation,bus ticket
+rapido,transportation,rapido
+cab,transportation,cab
+taxi,transportation,taxi
+hoodie,shopping,hoodie
+cap,shopping,cap
+earphone,shopping,earphone
+belt,shopping,belt
+mask,health,mask
+showergel,personal care,showergel
+shoes,shopping,shoes
+mirror,shopping,mirror
+bean bag,shopping,bean bag
+bus ticket,transportation,bus ticket
+medical expenses,health,medical expenses
+car payment,transportation,car payment
+internet,utilities,internet
+phone,utilities,phone
+health insurance,health,health insurance
+insurance,transportation,insurance
+clothing ,shopping,clothing
+cosmetics,personal care,cosmetics
+prescriptions,health,prescriptions
+netflix,entertainment,netflix
+spotify,entertainment,spotify
+amazon prime,entertainment,amazon prime
+sporting events,entertainment,sporting events
+yoga classes,fitness,yoga classes
+subscriptions,entertainment,subscriptions
+public transportation,transportation,public transportation
+flights,transportation,flights
+gifts,gifts,gifts
+donations,donations,donations
+home repair,housing,home repair
+pet expenses,other,pet expenses
+medicine,health,medicine
+fill petrol,fuel,fill petrol
+went beauty parler,grooming,went beauty parler
+paid school fees,education,paid school fees
+college fees payment,education,college fees payment
+petrolled vehicle,fuel,petrolled vehicle
+recharge mobile,utilities,recharge mobile
+salary credited,income,salary credited
+paid gym membership fees,health,paid gym membership fees
+purchased jeans shirts,clothes,purchased jeans shirts
+paid landlord,utilities,paid landlord
+land lord payment,utilities,land lord payment
+purchased monthly groceries,groceries,purchased monthly groceries
+recharged dishtv,entertainment,recharged dishtv
+purchased book,education,purchased book
+paid barber,grooming,paid barber
+gave party friend,party,gave party friend
+cat food purchase,pet expense,cat food purchase
+purchased mobile cover,electronic,purchased mobile cover
+purchased bread butter,food,purchased bread butter
+purchased butter chicken,food,purchased butter chicken
+purchased earphones,electronic,purchased earphones
+buying vr set,entertainment,buying vr set
+purchased new cricket kit,sports,purchased new cricket kit
+purchased the badminton bats,sports,purchased badminton bats
+paid to the barber,utilities,paid barber
+paid to the beauty parler,grooming,paid beauty parler
+purchased the grocery ,groceries,purchased grocery
+ate icecream,food,ate icecream
+ate icecream,food,ate icecream
+purchased new tv,entertainment,purchased new tv
+paid to the landlord ,utilities,paid landlord
+paid the cylinder bill,utilities,paid cylinder bill
+purchased new school bag,education,purchased new school bag
+today i purchased the college bag,education,today purchased college bag
+purchased new college bag,education,purchased new college bag
+purchased new football,sports,purchased new football
+paid to the beauty parler,grooming,paid beauty parler
+paid to the landlord,utilities,paid landlord
+attended the concert of honey singh,entertainment,attended concert honey singh
+attended concert of neha kakkar,entertainment,attended concert neha kakkar
+purchased the new notebook,education,purchased new notebook
+purchased bread and butter,food,purchased bread butter
+purchased bread and butter,food,purchased bread butter
+travelling from home to college,travelling,travelling home college
+purchased new cricket kit ,sports,purchased new cricket kit
+purchased new cricket kit ,sports,purchased new cricket kit
+purchased new facecream,grooming,purchased new facecream
+purchased gift for brothers birthday,gift,purchased gift brothers birthday
+purchased new notebooks,education,purchased new notebooks
+purchased new tshirt  ,clothes,purchased new tshirt
+purchased bread and butter ,food,purchased bread butter
+paid the wifi bill,utilities,paid wifi bill
+paid to the bus driver,transportation,paid bus driver
+paid to the beauty parler,grooming,paid beauty parler
+keratin treatment,groo,keratin treatment
+keratin treatment,grooming,keratin treatment
+eat snacks,food,eat snacks
+car washing,vehicle expense,car washing
+spend money for car washing,vehicle expense,spend money car washing
+paid to the barber shop,grooming,paid barber shop
+vehicle service,vehicle expense,vehicle service
+paid the veg thali bill,food,paid veg thali bill
+mess payment,food,mess payment
+purchased new cricket bat,sports,purchased new cricket bat
+paid the electricity bill,utilities,paid electricity bill
+hair keratin,grooming,hair keratin
+shopping from market,shopping,shopping market
+purchase notebook,education,purchase notebook
+paid the gym membership fee,fitness,paid gym membership fee
+paid gym membership fee,fitness,paid gym membership fee
+purchased vegetables from market,food,purchased vegetables market
+Train Fare,travelling,train fare
+purchased vegetables from the market,food,purchased vegetables market
+purchased fruits and vegetables,food,purchased fruits vegetables
+Recharged the mobile ,utilities,recharged mobile
+purchased fruits and vegetables ,food,purchased fruits vegetables
+purchased tv,entertainment,purchased tv
+paid to the barber shop,grooming,paid barber shop
+purchased new dish tv,entertainment,purchased new dish tv
+purchased tv,entertainment,purchased tv
+purchased tv,entertainment,purchased tv
+paid to the barber shop,grooming,paid barber shop
+purchased cricket bat,sports,purchased cricket bat
+purchased groceries,groceries,purchased groceries
+purchased fruit and vegetables,food,purchased fruit vegetables
+grocery,groceries,grocery
+car EMi,transportation,car emi
+Home Loan,housing,home loan
+Phone EMI,utilities,phone emi
+PIzza,food,pizza
+Coffee,food,coffee
+electricity bill,utilities,electricity bill
+Gas bill,utilities,gas bill
+Party,food,party
+friend,food,friend
+clothes,shopping,clothes
+netflix subscription,entertainment,netflix subscription
+paneer,food,paneer
+facial,personal care,facial
+sanitizer,health,sanitizer
+gas cylinder,utilities,gas cylinder
+certification,education,certification
+spotify premium,entertainment,spotify premium
+cab fare,transportation,cab fare
+notebook,education,notebook
+jio recharge,utilities,jio recharge
+bag,shopping,bag
+postpaid bill,utilities,postpaid bill
+health checkup,health,health checkup
+health insurance premium,health,health insurance premium
+moisturizer,personal care,moisturizer
+amusement park,entertainment,amusement park
+pharmacy,health,pharmacy
+doctor consultation,health,doctor consultation
+dosa,food,dosa
+water bill,utilities,water bill
+beard trimming,personal care,beard trimming
+coaching fee,education,coaching fee
+deodorant,personal care,deodorant
+society maintenance,utilities,society maintenance
+printer ink,education,printer ink
+hospital bill,health,hospital bill
+household items,shopping,household items
+makeup,personal care,makeup
+protein powder,health,protein powder
+ola cab,transportation,ola cab
+flight ticket,transportation,flight ticket
+vehicle maintenance,transportation,vehicle maintenance
+stationery,education,stationery
+eye checkup,health,eye checkup
+dth recharge,utilities,dth recharge
+hair oil,personal care,hair oil
+perfume,personal care,perfume
+auto rickshaw,transportation,auto rickshaw
+burger,food,burger
+bike service,transportation,bike service
+yoga class,health,yoga class
+tyre puncture,transportation,tyre puncture
+sweets,food,sweets
+pen set,education,pen set
+event ticket,entertainment,event ticket
+potato,food,potato
+online course,education,online course
+dental care,health,dental care
+movie ticket,entertainment,movie ticket
+waxing,personal care,waxing
+train ticket,transportation,train ticket
+lipstick,personal care,lipstick
+course fee,education,course fee
+landline bill,utilities,landline bill
+tomato,food,tomato
+jacket,shopping,jacket
+nail salon,personal care,nail salon
+study material,education,study material
+mobile accessories,shopping,mobile accessories
+physiotherapy,health,physiotherapy
+vaccination,health,vaccination
+earphones,shopping,earphones
+zoo entry,entertainment,zoo entry
+comedy show,entertainment,comedy show
+flipkart purchase,shopping,flipkart purchase
+diesel,transportation,diesel
+exam fee,education,exam fee
+oil change,transportation,oil change
+vitamins,health,vitamins
+gym membership,health,gym membership
+library fee,education,library fee
+kindle book,entertainment,kindle book
+razor,personal care,razor
+petrol,transportation,petrol
+magazine,entertainment,magazine
+blood test,health,blood test
+udemy subscription,education,udemy subscription
+workshop fee,education,workshop fee
+wifi bill,utilities,wifi bill
+metro card recharge,transportation,metro card recharge
+jeans,shopping,jeans
+butter,food,butter
+socks,shopping,socks
+first aid kit,health,first aid kit
+fuel,transportation,fuel
+saree,shopping,saree
+salon visit,personal care,salon visit
+mobile recharge,utilities,mobile recharge
+youtube premium,entertainment,youtube premium
+samosa,food,samosa
+fruit salad,food,fruit salad
+sandwich,food,sandwich
+arcade games,entertainment,arcade games
+wallet,shopping,wallet
+shampoo,personal care,shampoo
+sunscreen,personal care,sunscreen
+broadband plan,utilities,broadband plan
+bowling,entertainment,bowling
+amazon order,shopping,amazon order
+airtel recharge,utilities,airtel recharge
+paratha,food,paratha
+play station,entertainment,play station
+toll tax,transportation,toll tax
+watch,shopping,watch
+groceries,food,groceries
+curtain,shopping,curtain
+uber ride,transportation,uber ride
+idli,food,idli
+face wash,personal care,face wash
+college fee,education,college fee
+toothpaste,personal care,toothpaste
+book purchase,entertainment,book purchase
+piped gas bill,utilities,piped gas bill
+poha,food,poha
+parking fee,transportation,parking fee
+shirt,shopping,shirt
+lab test,health,lab test
+chai,food,chai
+cold drink,food,cold drink
+egg,food,egg
+kurta,shopping,kurta
+sunglasses,shopping,sunglasses
+online shopping,shopping,online shopping
+fish,food,fish
+chicken,food,chicken
+bedsheet,shopping,bedsheet
+body wash,personal care,body wash
+gaming,entertainment,gaming
+maggi,food,maggi
+biryani,food,biryani
+perfume,personal care,perfume
+mobile recharge,utilities,mobile recharge
+pizza,food,pizza
+coffee,food,coffee
+electricity bill,utilities,electricity bill
+chips,food,chips
+petrol,transportation,petrol
+juice,food,juice
+tissue,Household Supplies,tissue
+petrol,transportation,petrol
+Cloths,Shopping,cloths
+medicine,health,medicine
+noodles,food,noodles
+russian class,Shopping,russian class
+Medical services from Harris Health,health,medical services harris health
+groceries,food,groceries
+Bistro Restaurant,food,bistro restaurant
+Hotel City Lite Meal,food,hotel city lite meal
+Himalaya Punjab Family Restaurant,food,himalaya punjab family restaurant
+Petrol from CDS Agencies HPCL,transportation,petrol cds agencies hpcl
+Mutual Fund Decline - Portfolio value decreased,Investments,mutual fund decline portfolio value decreased
+Forex Trading Loss - Temporary market setback,Investments,forex trading loss temporary market setback
+Options Trading Loss - Short-term investment loss,Investments,options trading loss investment loss
+ETF Value Drop - Loss booked after market dip,Investments,etf value drop loss booked market dip
+Gold Price Decline - Loss booked after market dip,Investments,gold price decline loss booked market dip
+SIP Market Correction - Short-term investment loss,Investments,sip market correction investment loss
+Stock Market Loss - Price fluctuation loss,Investments,stock market loss price fluctuation loss
+Crypto Trading Loss - Volatility-related decline,Investments,crypto trading loss decline
+Gold Price Decline - Portfolio value decreased,Investments,gold price decline portfolio value decreased
+ETF Value Drop - Capital depreciation recorded,Investments,etf value drop capital depreciation recorded
+Stock Market Loss - Capital depreciation recorded,Investments,stock market loss capital depreciation recorded
+Mutual Fund Decline - Volatility-related decline,Investments,mutual fund decline decline
+SIP Market Correction - Temporary market setback,Investments,sip market correction temporary market setback
+Mutual Fund Decline - Market correction impact,Investments,mutual fund decline market correction impact
+Mutual Fund Decline - Price fluctuation loss,Investments,mutual fund decline price fluctuation loss
+Crypto Trading Loss - Loss booked after market dip,Investments,crypto trading loss loss booked market dip
+Gold Price Decline - Short-term investment loss,Investments,gold price decline investment loss
+ETF Value Drop - Market correction impact,Investments,etf value drop market correction impact
+Mutual Fund Decline - Capital depreciation recorded,Investments,mutual fund decline capital depreciation recorded
+SIP Market Correction - Price fluctuation loss,Investments,sip market correction price fluctuation loss
+Crypto Trading Loss - Short-term investment loss,Investments,crypto trading loss investment loss
+Mutual Fund Decline - Loss booked after market dip,Investments,mutual fund decline loss booked market dip
+Mutual Fund Decline - Investment value reduction,Investments,mutual fund decline investment value reduction
+Options Trading Loss - Loss booked after market dip,Investments,options trading loss loss booked market dip
+Gold Price Decline - Volatility-related decline,Investments,gold price decline decline
+Bond Investment Loss - Portfolio value decreased,Investments,bond investment loss portfolio value decreased
+Gold Price Decline - Bear market adjustment,Investments,gold price decline bear market adjustment
+Forex Trading Loss - Price fluctuation loss,Investments,forex trading loss price fluctuation loss
+Forex Trading Loss - Portfolio value decreased,Investments,forex trading loss portfolio value decreased
+ETF Value Drop - Price fluctuation loss,Investments,etf value drop price fluctuation loss
+REIT Portfolio Loss - Price fluctuation loss,Investments,reit portfolio loss price fluctuation loss
+Crypto Trading Loss - Capital depreciation recorded,Investments,crypto trading loss capital depreciation recorded
+SIP Market Correction - Loss booked after market dip,Investments,sip market correction loss booked market dip
+Bond Investment Loss - Loss booked after market dip,Investments,bond investment loss loss booked market dip
+ETF Value Drop - Short-term investment loss,Investments,etf value drop investment loss
+REIT Portfolio Loss - Bear market adjustment,Investments,reit portfolio loss bear market adjustment
+Forex Trading Loss - Bear market adjustment,Investments,forex trading loss bear market adjustment
+Bond Investment Loss - Short-term investment loss,Investments,bond investment loss investment loss
+REIT Portfolio Loss - Market correction impact,Investments,reit portfolio loss market correction impact
+Crypto Trading Loss - Investment value reduction,Investments,crypto trading loss investment value reduction
+Bond Investment Loss - Capital depreciation recorded,Investments,bond investment loss capital depreciation recorded
+Bond Investment Loss - Bear market adjustment,Investments,bond investment loss bear market adjustment
+REIT Portfolio Loss - Short-term investment loss,Investments,reit portfolio loss investment loss
+REIT Portfolio Loss - Temporary market setback,Investments,reit portfolio loss temporary market setback
+Gold Price Decline - Price fluctuation loss,Investments,gold price decline price fluctuation loss
+Options Trading Loss - Volatility-related decline,Investments,options trading loss decline
+Stock Market Loss - Portfolio value decreased,Investments,stock market loss portfolio value decreased
+Options Trading Loss - Temporary market setback,Investments,options trading loss temporary market setback
+Mutual Fund Decline - Short-term investment loss,Investments,mutual fund decline investment loss
+Options Trading Loss - Capital depreciation recorded,Investments,options trading loss capital depreciation recorded
+ETF Value Drop - Temporary market setback,Investments,etf value drop temporary market setback
+Petrol from HPCL,transportation,petrol hpcl
+Sovereign Gold Bond purchase - growth strategy,Investments,sovereign gold bond purchase growth strategy
+Forex position opened - long-term portfolio,Investments,forex position opened portfolio
+SIP installment credited - short-term trade,Investments,sip installment credited trade
+FD booked - short-term trade,Investments,fd booked trade
+Options contract bought - short-term trade,Investments,options contract bought trade
+Derivative buy order - growth strategy,Investments,derivative buy order growth strategy
+REIT purchase order - diversified holdings,Investments,reit purchase order diversified holdings
+FD booked - long-term portfolio,Investments,fd booked portfolio
+SIP installment credited - diversified holdings,Investments,sip installment credited diversified holdings
+Crypto tokens acquired - short-term trade,Investments,crypto tokens acquired trade
+SIP installment credited - long-term portfolio,Investments,sip installment credited portfolio
+Bought shares of diversified holdings,Investments,bought shares diversified holdings
+Crypto buy executed - diversified holdings,Investments,crypto buy executed diversified holdings
+Forex position opened - retirement fund,Investments,forex position opened retirement fund
+Real Estate REIT units bought - growth strategy,Investments,real estate reit units bought growth strategy
+Term deposit invested - long-term portfolio,Investments,term deposit invested portfolio
+Stock buy order executed - retirement fund,Investments,stock buy order executed retirement fund
+SIP installment credited - growth strategy,Investments,sip installment credited growth strategy
+Call option purchased - retirement fund,Investments,call option purchased retirement fund
+Index ETF purchase - diversified holdings,Investments,index etf purchase diversified holdings
+Lump-sum MF investment - retirement fund,Investments,mf investment retirement fund
+Bought shares of short-term trade,Investments,bought shares trade
+Digital asset purchase - growth strategy,Investments,digital asset purchase growth strategy
+Fixed deposit created - growth strategy,Investments,fixed deposit created growth strategy
+ETF units bought - retirement fund,Investments,etf units bought retirement fund
+Digital gold bought - retirement fund,Investments,digital gold bought retirement fund
+Derivative buy order - long-term portfolio,Investments,derivative buy order portfolio
+Stock buy order executed - long-term portfolio,Investments,stock buy order executed portfolio
+Call option purchased - short-term trade,Investments,call option purchased trade
+Call option purchased - long-term portfolio,Investments,call option purchased portfolio
+Forex buy executed - long-term portfolio,Investments,forex buy executed portfolio
+Property fund investment - long-term portfolio,Investments,property fund investment portfolio
+Forex position opened - short-term trade,Investments,forex position opened trade
+Property fund investment - short-term trade,Investments,property fund investment trade
+Government bond investment - diversified holdings,Investments,government bond investment diversified holdings
+Digital asset purchase - diversified holdings,Investments,digital asset purchase diversified holdings
+Lump-sum MF investment - long-term portfolio,Investments,mf investment portfolio
+Call option purchased - diversified holdings,Investments,call option purchased diversified holdings
+Mutual fund units purchased - growth strategy,Investments,mutual fund units purchased growth strategy
+ETF buy order placed - retirement fund,Investments,etf buy order placed retirement fund
+Sovereign Gold Bond purchase - long-term portfolio,Investments,sovereign gold bond purchase portfolio
+Bond units allotted - growth strategy,Investments,bond units allotted growth strategy
+Options contract bought - retirement fund,Investments,options contract bought retirement fund
+Mutual fund units purchased - retirement fund,Investments,mutual fund units purchased retirement fund
+ETF units bought - short-term trade,Investments,etf units bought trade
+Index ETF purchase - long-term portfolio,Investments,index etf purchase portfolio
+Lump-sum MF investment - diversified holdings,Investments,mf investment diversified holdings
+Forex position opened - growth strategy,Investments,forex position opened growth strategy
+Bond units allotted - retirement fund,Investments,bond units allotted retirement fund
+Gold ETF units purchased - growth strategy,Investments,gold etf units purchased growth strategy
+REIT purchase order - long-term portfolio,Investments,reit purchase order portfolio
+Digital asset purchase - retirement fund,Investments,digital asset purchase retirement fund
+Crypto tokens acquired - growth strategy,Investments,crypto tokens acquired growth strategy
+Gold ETF units purchased - diversified holdings,Investments,gold etf units purchased diversified holdings
+REIT purchase order - short-term trade,Investments,reit purchase order trade
+Corporate bond bought - diversified holdings,Investments,corporate bond bought diversified holdings
+Gold ETF units purchased - long-term portfolio,Investments,gold etf units purchased portfolio
+Stock buy order executed - short-term trade,Investments,stock buy order executed trade
+Government bond investment - retirement fund,Investments,government bond investment retirement fund
+Forex buy executed - diversified holdings,Investments,forex buy executed diversified holdings
+Digital gold bought - short-term trade,Investments,digital gold bought trade
+Call option purchased - growth strategy,Investments,call option purchased growth strategy
+Property fund investment - growth strategy,Investments,property fund investment growth strategy
+Gold ETF units purchased - retirement fund,Investments,gold etf units purchased retirement fund
+Sovereign Gold Bond purchase - diversified holdings,Investments,sovereign gold bond purchase diversified holdings
+Forex buy executed - short-term trade,Investments,forex buy executed trade
+Fixed deposit created - retirement fund,Investments,fixed deposit created retirement fund
+Derivative buy order - retirement fund,Investments,derivative buy order retirement fund
+Lump-sum MF investment - growth strategy,Investments,mf investment growth strategy
+Equity purchase - growth strategy,Investments,equity purchase growth strategy
+Term deposit invested - retirement fund,Investments,term deposit invested retirement fund
+Crypto buy executed - growth strategy,Investments,crypto buy executed growth strategy
+SIP installment credited - retirement fund,Investments,sip installment credited retirement fund
+Digital asset purchase - long-term portfolio,Investments,digital asset purchase portfolio
+Term deposit invested - short-term trade,Investments,term deposit invested trade
+Sovereign Gold Bond purchase - retirement fund,Investments,sovereign gold bond purchase retirement fund
+Crypto buy executed - retirement fund,Investments,crypto buy executed retirement fund
+Corporate bond bought - short-term trade,Investments,corporate bond bought trade
+Fixed deposit created - long-term portfolio,Investments,fixed deposit created portfolio
+Property fund investment - retirement fund,Investments,property fund investment retirement fund
+Currency pair investment - growth strategy,Investments,currency pair investment growth strategy
+Property fund investment - diversified holdings,Investments,property fund investment diversified holdings
+Fixed deposit created - diversified holdings,Investments,fixed deposit created diversified holdings
+Bought shares of long-term portfolio,Investments,bought shares portfolio
+Gold Buy - Growth Strategy,Investments,gold buy growth strategy
+Crypto Buy - Short-Term Trade,Investments,crypto buy trade
+Mutual Fund Buy - Retirement Fund,Investments,mutual fund buy retirement fund
+Options Buy - Growth Strategy,Investments,options buy growth strategy
+Fixed Deposit Buy - Short-Term Trade,Investments,fixed deposit buy trade
+Gold Buy - Short-Term Trade,Investments,gold buy trade
+Gold Buy - Retirement Fund,Investments,gold buy retirement fund
+Mutual Fund Buy - Growth Strategy,Investments,mutual fund buy growth strategy
+Mutual Fund Buy - Diversified Holdings,Investments,mutual fund buy diversified holdings
+Forex Buy - Short-Term Trade,Investments,forex buy trade
+Forex Buy - Growth Strategy,Investments,forex buy growth strategy
+Mutual Fund Buy - Long-Term Portfolio,Investments,mutual fund buy portfolio
+Mutual Fund Buy - Short-Term Trade,Investments,mutual fund buy trade
+Forex Buy - Retirement Fund,Investments,forex buy retirement fund
+Fixed Deposit Buy - Retirement Fund,Investments,fixed deposit buy retirement fund
+Bond Buy - Retirement Fund,Investments,bond buy retirement fund
+Fixed Deposit Buy - Long-Term Portfolio,Investments,fixed deposit buy portfolio
+Stock Buy - Retirement Fund,Investments,stock buy retirement fund
+ETF Buy - Retirement Fund,Investments,etf buy retirement fund
+Stock Buy - Long-Term Portfolio,Investments,stock buy portfolio
+Fixed Deposit Buy - Growth Strategy,Investments,fixed deposit buy growth strategy
+Stock Buy - Growth Strategy,Investments,stock buy growth strategy
+Fixed Deposit Buy - Diversified Holdings,Investments,fixed deposit buy diversified holdings
+Options Buy - Retirement Fund,Investments,options buy retirement fund
+Crypto Buy - Diversified Holdings,Investments,crypto buy diversified holdings
+Stock Buy - Short-Term Trade,Investments,stock buy trade
+Stock Buy - Diversified Holdings,Investments,stock buy diversified holdings
+Options Buy - Short-Term Trade,Investments,options buy trade
+ETF Buy - Long-Term Portfolio,Investments,etf buy portfolio
+Crypto Buy - Retirement Fund,Investments,crypto buy retirement fund
+Forex Buy - Long-Term Portfolio,Investments,forex buy portfolio
+REIT Buy - Short-Term Trade,Investments,reit buy trade
+Options Buy - Diversified Holdings,Investments,options buy diversified holdings
+Bond Buy - Long-Term Portfolio,Investments,bond buy portfolio
+Bond Buy - Diversified Holdings,Investments,bond buy diversified holdings
+ETF Buy - Diversified Holdings,Investments,etf buy diversified holdings
+Gold Buy - Diversified Holdings,Investments,gold buy diversified holdings
+Bond Buy - Growth Strategy,Investments,bond buy growth strategy
+Gold Buy - Long-Term Portfolio,Investments,gold buy portfolio
+Options Buy - Long-Term Portfolio,Investments,options buy portfolio
+REIT Buy - Growth Strategy,Investments,reit buy growth strategy
+Crypto Buy - Growth Strategy,Investments,crypto buy growth strategy
+REIT Buy - Long-Term Portfolio,Investments,reit buy portfolio
+Crypto Buy - Long-Term Portfolio,Investments,crypto buy portfolio
+REIT Buy - Diversified Holdings,Investments,reit buy diversified holdings
+Forex Buy - Diversified Holdings,Investments,forex buy diversified holdings
+ETF Buy - Short-Term Trade,Investments,etf buy trade
+REIT Buy - Retirement Fund,Investments,reit buy retirement fund
+Hotstar subscription,entertainment ,hotstar subscription
+trimmer,personal care,trimmer
+Petrol,transportation,petrol
+electricity bill,utilities,electricity bill
+note books,education,note books
+vegetables,food,vegetables
+stomach medicine,health,stomach medicine
+cake,food,cake
+doctor visit,health,doctor visit
+restaurant,food,restaurant
+movie,entertainment,movie
+course purchase,education,course purchase
+headphones,shopping,headphones
+internet recharge,utilities,internet recharge
+keyboard,shopping,keyboard
+clothes,shopping,clothes
+bag,shopping,bag
+bag,shopping,bag
+petrol,transportation,petrol
+petrol,transportation,petrol
+burger,food,burger
+chips,food,chips
+groceries,Household Supplies,groceries
+petrol,transportation,petrol
+trimmer,personal care,trimmer
+fruits,food,fruits
+biscuits,food,biscuits
+Petrol from HPCL,transportation,petrol hpcl
+T shirt,shopping,shirt
+fruits,food,fruits
+pizza,food,pizza
+pizza,food,pizza
+burger,food,burger
+soap,personal care,soap
+Household essentials,household supplies,household essentials
+Streaming subscription,entertainment,streaming subscription
+Fuel refill,fuel,fuel refill
+Coffee at cafe,food,coffee cafe
+Lunch & dinner,food,lunch dinner
+Mobile/DTH recharge,other,recharge
+Auto/cab fare,transportation,fare
+Personal care,personal care,personal care

@@ -1,0 +1,80 @@
+{% extends 'base.html' %} 
+
+{% block title %}Edit Income{% endblock %}
+{% block page_title %}Edit Income{% endblock %}
+
+{% block content %}
+<div class="max-w-[480px] mx-auto mt-8">
+    <div class="mb-6 flex justify-between items-center">
+        <a href="{% url 'income' %}" class="flex items-center gap-2 text-muted hover:text-light transition-colors text-sm font-medium w-fit">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Income
+        </a>
+        
+        <form action="{% url 'income-delete' income.id %}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this income?');">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 text-danger/80 hover:text-danger bg-danger/10 hover:bg-danger/20 px-3 py-1.5 rounded transition-colors text-sm font-medium">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+            </button>
+        </form>
+    </div>
+
+    <div class="glass-card p-8 sm:p-10 relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full pointer-events-none"></div>
+
+        <div class="relative z-10">
+            <h2 class="text-2xl font-bold text-light mb-8 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                    <i data-lucide="edit-2" class="w-5 h-5"></i>
+                </div>
+                Edit Income
+            </h2>
+
+            <form action="{% url 'income-edit' income.id %}" method="post" class="space-y-6">
+        
+                {% csrf_token %}
+                
+                <!-- Amount Field -->
+                <div class="relative">
+                    <input type="number" step="0.01" name="amount" id="amountField" value="{{values.amount}}" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface-elevated border border-white/10 rounded-lg appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" " />
+                    <label for="amountField" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Amount</label>
+                </div>
+
+                <!-- Description Field -->
+                <div class="relative">
+                    <input type="text" name="description" id="description-input" value="{{values.description}}" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface-elevated border border-white/10 rounded-lg appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" " />
+                    <label for="description-input" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Description</label>
+                </div>
+
+                <!-- Source Field -->
+                <div class="relative group">
+                    <select name="source" id="source-input" required
+                        class="form-select block w-full px-4 pt-6 pb-2 text-light bg-surface-elevated border border-white/10 rounded-lg appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer cursor-pointer">
+                        <option value="{{values.source}}" selected>{{values.source}}</option>
+                        {% for source in sources %}
+                            <option value="{{source.name}}">{{source.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="source-input" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4">Source</label>
+                    <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <!-- Date Field -->
+                <div class="relative">
+                    <input type="date" name="income_date" id="dateField" value="{{values.date |date:'Y-m-d' }}" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface-elevated border border-white/10 rounded-lg appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer [color-scheme:dark]" placeholder=" " />
+                    <label for="dateField" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Date</label>
+                </div>
+
+                <button type="submit" class="submit-btn w-full py-3.5 px-4 bg-gradient-to-r from-primary to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white font-medium rounded-lg transition-all shadow-lg shadow-primary/25 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark mt-4">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Expense Summary{% endblock %}
+{% block page_title %}Expense Summary{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header & Date Filter -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
+        <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-light mb-1">Expense Summary</h1>
+            <p class="text-muted">Visualize your spending patterns and trends.</p>
+        </div>
+        
+        <div class="flex items-center bg-transparent border border-white/20 rounded-lg p-0.5">
+            <button class="filter-btn px-5 py-1.5 rounded-md text-sm text-muted hover:text-light transition-all" data-days="7">7d</button>
+            <button class="filter-btn px-5 py-1.5 rounded-md text-sm text-muted hover:text-light transition-all active" data-days="30">30d</button>
+            <button class="filter-btn px-5 py-1.5 rounded-md text-sm text-muted hover:text-light transition-all" data-days="90">3m</button>
+            <button class="filter-btn px-5 py-1.5 rounded-md text-sm text-muted hover:text-light transition-all" data-days="180">6m</button>
+        </div>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Daily -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-primary">
+                <i data-lucide="calendar" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">Today's Expenses</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-primary">&#8377; {{ daily_expense|floatformat:"2"|default:"0.00" }}</h3>
+            </div>
+        </div>
+        
+        <!-- Weekly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-success">
+                <i data-lucide="calendar-days" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Week's Expenses</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-success">&#8377; {{ weekly_expense|floatformat:"2"|default:"0.00" }}</h3>
+            </div>
+        </div>
+
+        <!-- Monthly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-secondary">
+                <i data-lucide="bar-chart" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Month's Expenses</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-secondary">&#8377; {{ monthly_expense|floatformat:"2"|default:"0.00" }}</h3>
+            </div>
+        </div>
+
+        <!-- Yearly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-danger">
+                <i data-lucide="pie-chart" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Year's Expenses</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-danger">&#8377; {{ yearly_expense|floatformat:2|default:"0.00" }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="flex flex-col items-center justify-center py-32 w-full">
+        <i data-lucide="loader-2" class="w-10 h-10 text-primary animate-spin mb-4"></i>
+        <p class="text-muted text-sm font-medium">Loading your financial data...</p>
+    </div>
+
+    <!-- Charts Grid -->
+    <div id="chartsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-16 hidden">
+        
+        <!-- Doughnut Chart (Categories) -->
+        <div class="flex flex-col">
+            <h3 class="text-lg font-bold text-light mb-8">Categories</h3>
+            
+            <div class="flex flex-col md:flex-row items-center justify-start w-full gap-12">
+                <div class="relative w-full max-w-[320px] aspect-square flex items-center justify-center shrink-0">
+                    <canvas id="myChart"></canvas>
+                </div>
+                
+                <!-- Custom Legend -->
+                <div id="chart-legend" class="w-full max-h-[300px] overflow-y-auto pr-2 space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Bar Chart (Daily Trend) -->
+        <div class="flex flex-col">
+            <h3 class="text-lg font-bold text-light mb-8">Daily Trend</h3>
+            <div class="w-full flex-1 min-h-[350px] relative">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Styling for the active filter button to match screenshot exactly */
+    .filter-btn.active {
+        background-color: #2D334A; /* dark greyish blue matching screenshot */
+        color: #F8FAFC;
+    }
+</style>
+
+<script src="{% static 'js/stats.js' %}?v={{ request.resolver_match.view_name|default:'0' }}{% now 'U' %}"></script>
+{% endblock content %}

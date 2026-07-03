@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+{% block toast_position %}
+<style>
+  #toast-container {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="fixed inset-0 z-50 flex bg-dark overflow-hidden">
+    <!-- Left Panel: Branding -->
+    <div class="hidden lg:flex flex-col justify-center w-1/2 bg-surface-elevated p-12 lg:p-24 relative overflow-hidden">
+        <!-- Abstract Decoration -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary blur-[100px]"></div>
+        </div>
+
+        <div class="relative z-10">
+            <div class="flex items-center gap-3 text-3xl font-bold text-light mb-8">
+                <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center overflow-hidden">
+                    <img src="{% static 'img/finsight_logo.png' %}" alt="Logo" class="w-8 h-8 object-contain">
+                </div>
+                FinSight
+            </div>
+            
+            <h1 class="text-4xl lg:text-5xl font-bold text-light leading-tight mb-6">
+                Track. Analyze. Save.
+            </h1>
+            <p class="text-muted text-lg mb-12 max-w-md">
+                Take control of your personal finances with AI-driven insights and a powerful modern dashboard.
+            </p>
+
+            <ul class="space-y-6 text-light">
+                <li class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center text-success shrink-0">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg">Smart Expense Categorization</span>
+                </li>
+                <li class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                        <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg">Dynamic Visual Reports</span>
+                </li>
+                <li class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary shrink-0">
+                        <i data-lucide="target" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg">Predictive Goal Tracking</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative overflow-y-auto">
+        <!-- Mobile Logo -->
+        <div class="absolute top-8 left-8 flex items-center gap-2 lg:hidden">
+            <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+                <img src="{% static 'img/finsight_logo.png' %}" alt="Logo" class="w-6 h-6 object-contain">
+            </div>
+            <span class="text-xl font-bold text-light">FinSight</span>
+        </div>
+
+        <div class="w-full max-w-md glass-card p-8 sm:p-10 relative z-10 mt-12 lg:mt-0">
+            <h2 class="text-2xl font-bold text-light mb-2">Create an Account</h2>
+            <p class="text-muted mb-8">Join FinSight and start tracking today.</p>
+
+
+
+            <form action="{% url 'register' %}" method="POST" class="space-y-5">
+                {% csrf_token %}
+
+                <!-- Floating Label Input: Username -->
+                <div class="relative">
+                    <input type="text" name="username" id="usernameField" value="{{fieldValues.username}}" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-transparent rounded-lg appearance-none focus:outline-none focus:ring-0 peer" placeholder=" " />
+                    <label for="usernameField" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Username</label>
+                    <div class="invalid_feedback text-sm text-danger mt-1" style="display:none"></div>
+                    <p class="text-sm text-success usernameSuccessOutput mt-1"></p>
+                </div>
+
+                <!-- Floating Label Input: Email -->
+                <div class="relative">
+                    <input type="email" name="email" id="emailField" value="{{fieldValues.email}}" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-transparent rounded-lg appearance-none focus:outline-none focus:ring-0 peer" placeholder=" " />
+                    <label for="emailField" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Email</label>
+                    <div class="emailFeedBackArea text-sm text-danger mt-1" style="display:none"></div>
+                </div>
+
+                <!-- Floating Label Input: Password -->
+                <div class="relative group">
+                    <input type="password" name="password" id="passwordField" required
+                        class="form-input block w-full px-4 pt-6 pb-2 text-light bg-transparent rounded-lg appearance-none focus:outline-none focus:ring-0 peer" placeholder=" " />
+                    <label for="passwordField" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Password</label>
+                    <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-light transition-colors showPasswordToggle">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="submit-btn w-full py-3 px-4 bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white font-medium rounded-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark mt-4">
+                    Register
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-sm text-muted">
+                Already have an account? <a href="{% url 'login' %}" class="text-primary hover:text-white transition-colors font-medium">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/register.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Show/Hide password toggle logic
+        const toggleBtn = document.querySelector('.showPasswordToggle');
+        const passField = document.getElementById('passwordField');
+        if (toggleBtn && passField) {
+            toggleBtn.addEventListener('click', () => {
+                const icon = toggleBtn.querySelector('i');
+                if (passField.type === 'password') {
+                    passField.type = 'text';
+                    if(icon) icon.setAttribute('data-lucide', 'eye-off');
+                } else {
+                    passField.type = 'password';
+                    if(icon) icon.setAttribute('data-lucide', 'eye');
+                }
+                lucide.createIcons();
+            });
+        }
+    });
+</script>
+{% endblock content %}

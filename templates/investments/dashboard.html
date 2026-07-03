@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Investment Dashboard{% endblock %}
+{% block page_title %}Investment Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl lg:text-3xl font-bold text-light mb-1">Investment Dashboard</h1>
+      <p class="text-muted">Overview of your investment portfolio and returns.</p>
+    </div>
+
+    <a href="{% url 'export_investments_csv' %}"
+        class="flex items-center gap-2 bg-transparent border border-teal-400 text-teal-400 hover:bg-teal-400/10 px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-teal-400/10">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Generate Report
+    </a>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="stat-cards">
+      <!-- Total Invested (Leftmost) -->
+      <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+          <div class="absolute right-[-10%] top-[-10%] opacity-5 text-primary">
+              <i data-lucide="briefcase" class="w-24 h-24"></i>
+          </div>
+          <p class="text-sm font-medium text-muted mb-2 relative z-10">Total Invested</p>
+          <div class="flex flex-col gap-1 relative z-10">
+              <h3 class="text-3xl font-bold text-light tabular-nums count-up whitespace-nowrap neon-text-primary" id="total-invested">₹ 0.00</h3>
+              <p class="text-xs text-muted">From expense records</p>
+          </div>
+      </div>
+
+      <!-- Total Returns -->
+      <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+          <div class="absolute right-[-10%] top-[-10%] opacity-5 text-secondary">
+              <i data-lucide="trending-up" class="w-24 h-24"></i>
+          </div>
+          <p class="text-sm font-medium text-muted mb-2 relative z-10">Total Returns</p>
+          <div class="flex flex-col gap-1 relative z-10">
+              <h3 class="text-3xl font-bold text-light tabular-nums count-up whitespace-nowrap" id="total-returns">₹ 0.00</h3>
+              <p class="text-xs text-muted">From income records</p>
+          </div>
+      </div>
+
+      <!-- Net P&L -->
+      <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+          <div class="absolute right-[-10%] top-[-10%] opacity-5 text-white">
+              <i data-lucide="activity" class="w-24 h-24"></i>
+          </div>
+          <p class="text-sm font-medium text-muted mb-2 relative z-10">Net P&amp;L</p>
+          <div class="flex flex-col gap-1 relative z-10">
+              <h3 class="text-3xl font-bold tabular-nums count-up whitespace-nowrap" id="net-pnl">₹ 0.00</h3>
+              <p class="text-xs font-medium" id="pnl-status">0.0% | Break Even</p>
+          </div>
+      </div>
+
+      <!-- Best Month (Rightmost) -->
+      <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); --glow-color: rgba(45, 212, 191, 0.2);">
+          <div class="absolute right-[-10%] top-[-10%] opacity-5 text-teal-400">
+              <i data-lucide="star" class="w-24 h-24"></i>
+          </div>
+          <p class="text-sm font-medium text-muted mb-2 relative z-10">Best Month</p>
+          <div class="flex flex-col gap-1 relative z-10">
+              <h3 class="text-3xl font-bold text-light tabular-nums whitespace-nowrap" id="best-month" style="text-shadow: 0 0 10px rgba(45, 212, 191, 0.5);">N/A</h3>
+              <p class="text-xs text-teal-400 font-medium" id="best-month-returns">₹ 0 returns</p>
+          </div>
+          <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-teal-400/20 blur-3xl rounded-full"></div>
+      </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Portfolio Allocation Donut Chart -->
+      <div class="glass-card p-6 flex flex-col">
+          <h3 class="text-lg font-bold text-light mb-6">Portfolio Allocation</h3>
+          <div class="w-full flex-1 min-h-[300px] relative">
+              <canvas id="allocationChart"></canvas>
+          </div>
+      </div>
+
+      <!-- Monthly Invested vs Returns Bar Chart -->
+      <div class="glass-card p-6 flex flex-col">
+          <h3 class="text-lg font-bold text-light mb-6">Monthly Invested vs Returns</h3>
+          <div class="w-full flex-1 min-h-[300px] relative">
+              <canvas id="monthlyVsChart"></canvas>
+          </div>
+      </div>
+  </div>
+
+  <!-- P&L Table -->
+  <div class="glass-card p-0 overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h3 class="text-lg font-bold text-light">Portfolio P&amp;L Breakdown</h3>
+          <div class="flex items-center gap-3">
+              <span class="text-sm text-muted">Grouped by description</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="group-toggle" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-400"></div>
+              </label>
+          </div>
+      </div>
+      <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-light">
+              <thead class="text-xs text-gray-400 uppercase tracking-wider bg-white/5 border-b border-white/5">
+                  <tr>
+                      <th class="px-6 py-4 font-medium">Name / Description</th>
+                      <th class="px-6 py-4 font-medium text-right">Invested</th>
+                      <th class="px-6 py-4 font-medium text-right">Returns</th>
+                      <th class="px-6 py-4 font-medium text-right">P&amp;L (₹)</th>
+                      <th class="px-6 py-4 font-medium text-right">P&amp;L (%)</th>
+                      <th class="px-6 py-4 font-medium text-center">Status</th>
+                  </tr>
+              </thead>
+              <tbody id="pnl-table-body" class="divide-y divide-white/5">
+                  <!-- Rows generated dynamically -->
+              </tbody>
+          </table>
+      </div>
+  </div>
+
+</div>
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.font.family = 'Inter';
+
+        fetch("{% url 'investment_data' %}")
+            .then(res => res.json())
+            .then(data => {
+                // 1. Stat Cards
+                const summary = data.summary || {};
+                const netPnl = summary.net_pnl || 0;
+                const pnlPct = summary.pnl_pct || 0;
+
+                document.getElementById('total-invested').innerText = `₹ ${(summary.total_invested || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('total-returns').innerText = `₹ ${(summary.total_returns || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                const pnlEl = document.getElementById('net-pnl');
+                const pnlStatusEl = document.getElementById('pnl-status');
+                
+                pnlEl.innerText = `${netPnl >= 0 ? '+' : ''}₹ ${Math.abs(netPnl).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                if (netPnl > 0) {
+                    pnlEl.className = 'text-3xl font-bold tabular-nums count-up whitespace-nowrap text-teal-400';
+                    pnlStatusEl.className = 'text-xs font-medium text-teal-400';
+                    pnlStatusEl.innerText = `+${pnlPct}% | Profit`;
+                } else if (netPnl < 0) {
+                    pnlEl.className = 'text-3xl font-bold tabular-nums count-up whitespace-nowrap text-red-400';
+                    pnlStatusEl.className = 'text-xs font-medium text-red-400';
+                    pnlStatusEl.innerText = `${pnlPct}% | Loss`;
+                } else {
+                    pnlEl.className = 'text-3xl font-bold tabular-nums count-up whitespace-nowrap text-muted';
+                    pnlStatusEl.className = 'text-xs font-medium text-muted';
+                    pnlStatusEl.innerText = `0.0% | Break Even`;
+                }
+
+                if (summary.best_month !== 'N/A') {
+                    document.getElementById('best-month').innerText = summary.best_month;
+                    document.getElementById('best-month-returns').innerText = `₹ ${(summary.best_month_returns || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} returns`;
+                }
+
+                // 2. Donut Chart
+                const donutData = data.charts?.donut || { labels: [], data: [] };
+                const donutCtx = document.getElementById('allocationChart').getContext('2d');
+                new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: donutData.labels,
+                        datasets: [{
+                            data: donutData.data,
+                            backgroundColor: ['#a855f7', '#2dd4bf', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#84cc16'],
+                            borderWidth: 0,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 10, padding: 10, font: { size: 11 } } },
+                            tooltip: { callbacks: { label: ctx => ` ₹${ctx.parsed.toLocaleString('en-IN')}` } }
+                        }
+                    }
+                });
+
+                // 3. Bar Chart
+                const barData = data.charts?.bar || { labels: [], invested: [], returns: [], net_pnl: [] };
+                const barCtx = document.getElementById('monthlyVsChart').getContext('2d');
+                const netPnlColors = (barData.net_pnl || []).map(val => val >= 0 ? '#22c55e' : '#ef4444');
+                new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: barData.labels,
+                        datasets: [
+                            { label: 'Invested', data: barData.invested, backgroundColor: '#a855f7', borderRadius: 4 },
+                            { label: 'Returns', data: barData.returns, backgroundColor: '#2dd4bf', borderRadius: 4 },
+                            { label: 'Net P&L', data: barData.net_pnl || [], backgroundColor: netPnlColors, borderRadius: 4 },
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', align: 'end', labels: { color: '#94A3B8', boxWidth: 10, font: { size: 11 } } } },
+                        scales: {
+                            x: { ticks: { color: '#64748B' }, grid: { display: false } },
+                            y: { ticks: { color: '#64748B', callback: v => '₹' + v }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                        }
+                    }
+                });
+
+                // 4. P&L Table
+                const tableData = data.table_data || { detailed: [], basic: [] };
+                
+                const renderTable = (useDetailed) => {
+                    const rows = useDetailed ? tableData.detailed : tableData.basic;
+                    const tbody = document.getElementById('pnl-table-body');
+                    tbody.innerHTML = '';
+
+                    rows.forEach(row => {
+                        const pnl = row.pnl;
+                        const pnlPct = row.pnl_pct;
+                        
+                        let pnlColor = 'text-muted';
+                        let statusHtml = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-muted">Break Even</span>`;
+                        
+                        if (pnl > 0) {
+                            pnlColor = 'text-teal-400';
+                            statusHtml = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-teal-400/10 text-teal-400">Profit</span>`;
+                        } else if (pnl < 0) {
+                            pnlColor = 'text-red-400';
+                            statusHtml = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-red-400/10 text-red-400">Loss</span>`;
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-white/5 transition-colors';
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 font-medium">${row.name}</td>
+                            <td class="px-6 py-4 text-right text-muted">₹ ${row.invested.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="px-6 py-4 text-right text-muted">₹ ${row.returns.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="px-6 py-4 text-right font-bold ${pnlColor}">${pnl >= 0 ? '+' : ''}₹ ${Math.abs(pnl).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="px-6 py-4 text-right font-medium ${pnlColor}">${pnl >= 0 ? '+' : ''}${pnlPct}%</td>
+                            <td class="px-6 py-4 text-center">${statusHtml}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                };
+
+                const toggle = document.getElementById('group-toggle');
+                toggle.addEventListener('change', (e) => {
+                    renderTable(e.target.checked);
+                });
+
+                // Initial render
+                renderTable(toggle.checked);
+            })
+            .catch(err => console.error("Error loading investment data:", err));
+    });
+</script>
+{% endblock js %}

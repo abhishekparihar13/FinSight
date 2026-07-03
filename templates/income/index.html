@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Income{% endblock %}
+{% block page_title %}Income{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header: Breadcrumb and Add Button -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <!-- Breadcrumb -->
+        <div class="bg-[#1A1A24] px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm border border-white/5 w-full sm:w-auto flex-1">
+            <span class="text-primary font-medium">Income</span>
+            <span class="text-muted">/</span>
+            <span class="text-light">My Income</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'bulk-import-income' %}" class="bg-[#1A1A24] border border-white/5 hover:bg-white/5 text-light px-5 py-2.5 rounded-lg font-medium transition-all shrink-0 whitespace-nowrap flex items-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i> Import
+            </a>
+            <a href="{% url 'add-income' %}" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25 shrink-0 whitespace-nowrap flex items-center gap-2">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Income
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Controls -->
+    <div class="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+        <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted"></i>
+            <input type="text" id="searchField" placeholder="Search income..." class="w-full bg-[#1A1A24] border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all placeholder:text-muted/70">
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- Delete Selected Button (hidden by default) -->
+            <button id="deleteSelectedBtn" type="button" onclick="confirmDelete()" class="hidden items-center gap-2 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 px-4 py-2.5 rounded-lg font-medium transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Delete</span>
+            </button>
+            
+            <button type="button" onclick="document.getElementById('filterPanel').classList.toggle('hidden')" class="relative flex items-center gap-2 bg-[#1A1A24] border border-white/10 hover:bg-white/5 text-light px-4 py-2.5 rounded-lg font-medium transition-all">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Filter</span>
+                {% if active_filters %}
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-[#8B5CF6] rounded-full border-2 border-background"></span>
+                {% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div id="filterPanel" class="{% if not active_filters %}hidden{% endif %} p-4 sm:p-6 mb-6 rounded-lg border border-white/5 bg-[#1A1A24]">
+        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <input type="hidden" name="sort" value="{{ sort_order|default:'' }}">
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Source</label>
+                <select name="source" class="w-full bg-[#0A0A0F] border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all appearance-none">
+                    <option value="">All Sources</option>
+                    {% for src in sources %}
+                    <option value="{{ src.source }}" {% if filter_source == src.source %}selected{% endif %}>{{ src.source }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Date Range</label>
+                <div class="flex items-center gap-2">
+                    <input type="date" name="date_from" value="{{ filter_date_from|default:'' }}" class="w-full bg-[#0A0A0F] border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]">
+                    <span class="text-muted">to</span>
+                    <input type="date" name="date_to" value="{{ filter_date_to|default:'' }}" class="w-full bg-[#0A0A0F] border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-muted mb-1.5">Amount Range</label>
+                <div class="flex items-center gap-2">
+                    <input type="number" step="0.01" name="amount_min" placeholder="Min" value="{{ filter_amount_min|default:'' }}" class="w-full bg-[#0A0A0F] border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all">
+                    <span class="text-muted">-</span>
+                    <input type="number" step="0.01" name="amount_max" placeholder="Max" value="{{ filter_amount_max|default:'' }}" class="w-full bg-[#0A0A0F] border border-white/10 rounded-lg py-2 px-3 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all">
+                </div>
+            </div>
+            
+            <div class="flex items-end gap-2 md:col-start-4 justify-end">
+                <a href="?" class="px-4 py-2 rounded-lg text-muted hover:text-light transition-colors text-sm font-medium">Clear</a>
+                <button type="submit" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+
+    {% if income.count %}
+    <form id="bulkDeleteForm" method="post" action="{% url 'bulk-delete-income' %}">
+    {% csrf_token %}
+    <!-- Table -->
+    <div class="app-table overflow-x-auto rounded-lg border border-white/5 bg-[#0A0A0F]">
+        <table class="w-full text-left text-sm text-light">
+            <thead class="text-xs font-semibold bg-[#1A1A24] text-light border-b border-white/5">
+                <tr>
+                    <th scope="col" class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" class="w-4 h-4 rounded border-white/20 bg-surface-elevated text-primary focus:ring-primary focus:ring-offset-background transition-all">
+                            <div class="flex items-center gap-1.5">
+                                Amount
+                                <div class="flex gap-1 text-[#8B5CF6] text-xs">
+                                    <a href="?{{ filter_query }}&sort=amount_asc" class="hover:text-white transition-colors" title="Sort Ascending">&uarr;</a>
+                                    <a href="?{{ filter_query }}&sort=amount_desc" class="hover:text-white transition-colors" title="Sort Descending">&darr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th scope="col" class="px-6 py-4">Source</th>
+                    <th scope="col" class="px-6 py-4">Description</th>
+                    <th scope="col" class="px-6 py-4">
+                        <div class="flex items-center gap-1.5">
+                            Date
+                            <div class="flex gap-1 text-[#8B5CF6] text-xs">
+                                <a href="?{{ filter_query }}&sort=date_asc" class="hover:text-white transition-colors" title="Sort Ascending">&uarr;</a>
+                                <a href="?{{ filter_query }}&sort=date_desc" class="hover:text-white transition-colors" title="Sort Descending">&darr;</a>
+                            </div>
+                        </div>
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inc in page_obj %}
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="px-6 py-4 tabular-nums">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" name="selected_ids" value="{{ inc.id }}" onchange="updateDeleteButton()" class="income-checkbox w-4 h-4 rounded border-white/20 bg-surface-elevated text-primary focus:ring-primary focus:ring-offset-background transition-all">
+                            {{inc.amount}}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">{{inc.source}}</td>
+                    <td class="px-6 py-4 text-muted">{{inc.description}}</td>
+                    <td class="px-6 py-4">{{inc.date}}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'income-edit' inc.id %}" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-4 py-1.5 rounded text-xs font-medium transition-colors">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="no-results text-center text-muted py-8" style="display: none;">No results found.</p>
+
+    <!-- Search Results Table -->
+    <div class="table-output overflow-x-auto rounded-lg border border-white/5 bg-[#0A0A0F]" style="display: none;">
+        <table class="w-full text-left text-sm text-light">
+            <thead class="text-xs font-semibold bg-[#1A1A24] text-light border-b border-white/5">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Amount</th>
+                    <th scope="col" class="px-6 py-4">Source</th>
+                    <th scope="col" class="px-6 py-4">Description</th>
+                    <th scope="col" class="px-6 py-4">Date</th>
+                    <th scope="col" class="px-6 py-4"></th>
+                </tr>
+            </thead>
+            <tbody class="table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-sm text-muted">Showing page <span class="text-light font-medium">{{ page_obj.number }}</span> of <span class="text-light font-medium">{{ page_obj.paginator.num_pages }}</span></span>
+        
+        <div class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+            <a href="?{{ filter_query }}&page=1" class="px-3 py-1.5 rounded bg-[#1A1A24] border border-white/5 text-muted hover:bg-white/10 hover:text-light transition-colors text-sm font-medium" title="First Page">&laquo;</a>
+            <a href="?{{ filter_query }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded bg-[#1A1A24] border border-white/5 text-muted hover:bg-white/10 hover:text-light transition-colors text-sm font-medium">Previous</a>
+            {% endif %}
+            
+            {% if page_obj.has_next %}
+            <a href="?{{ filter_query }}&page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded bg-[#1A1A24] border border-white/5 text-muted hover:bg-white/10 hover:text-light transition-colors text-sm font-medium">Next</a>
+            <a href="?{{ filter_query }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1.5 rounded bg-[#1A1A24] border border-white/5 text-muted hover:bg-white/10 hover:text-light transition-colors text-sm font-medium" title="Last Page">&raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+    </form>
+    {% else %}
+    <!-- Empty State -->
+    <div class="p-12 flex flex-col items-center justify-center text-center mt-8 border border-white/5 rounded-xl bg-[#1A1A24]/30">
+        <div class="w-16 h-16 rounded-full bg-[#1A1A24] flex items-center justify-center text-muted mb-4 border border-white/5">
+            <i data-lucide="inbox" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-light mb-2">No Income Yet</h3>
+        <p class="text-muted mb-6 max-w-sm">You haven't recorded any income. Add your first income to start tracking.</p>
+        <a href="{% url 'add-income' %}" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25">
+            Add Income
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.income-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+        updateDeleteButton();
+    }
+
+    function updateDeleteButton() {
+        const checkboxes = document.querySelectorAll('.income-checkbox');
+        const deleteBtn = document.getElementById('deleteSelectedBtn');
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        
+        if (anyChecked) {
+            deleteBtn.classList.remove('hidden');
+            deleteBtn.classList.add('flex');
+        } else {
+            deleteBtn.classList.add('hidden');
+            deleteBtn.classList.remove('flex');
+            document.getElementById('selectAll').checked = false;
+        }
+    }
+
+    function confirmDelete() {
+        const checkboxes = document.querySelectorAll('.income-checkbox:checked');
+        if (checkboxes.length > 0) {
+            if (confirm(`Are you sure you want to delete ${checkboxes.length} selected income record(s)?`)) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        }
+    }
+</script>
+<script src="{% static 'js/searchIncome.js' %}"></script>
+{% endblock content %}

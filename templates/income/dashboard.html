@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Income Summary{% endblock %}
+{% block page_title %}Income {% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-light mb-1">Income Summary</h1>
+            <p class="text-muted">Overview of your revenue streams and earnings.</p>
+        </div>
+
+        <a href="{% url 'report' %}"
+            class="flex items-center gap-2 bg-surface-elevated border border-secondary text-secondary hover:bg-secondary hover:text-dark px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-secondary/10">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            Generate Report
+        </a>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Daily -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-primary">
+                <i data-lucide="calendar" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">Today's Income</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-primary">&#8377; {{daily_income|default:"0.00" }}</h3>
+            </div>
+        </div>
+
+        <!-- Weekly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-success">
+                <i data-lucide="calendar-days" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Week's Income</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-success">&#8377; {{weekly_income|default:"0.00" }}</h3>
+            </div>
+        </div>
+
+        <!-- Monthly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-secondary">
+                <i data-lucide="bar-chart" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Month's Income</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-secondary">&#8377; {{monthly_income|default:"0.00" }}</h3>
+            </div>
+        </div>
+
+        <!-- Yearly -->
+        <div class="glass-card p-6 relative overflow-hidden group hover-glow transition-all">
+            <div class="absolute right-[-10%] top-[-10%] opacity-5 text-danger">
+                <i data-lucide="pie-chart" class="w-24 h-24"></i>
+            </div>
+            <p class="text-sm font-medium text-muted mb-2 relative z-10">This Year's Income</p>
+            <div class="flex items-end gap-3 relative z-10">
+                <h3 class="text-3xl font-bold text-light tabular-nums count-up neon-text-danger">&#8377; {{yearly_income|default:"0.00" }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Monthly Breakdown Bar Chart -->
+        <div class="glass-card p-6 flex flex-col">
+            <h3 class="text-lg font-bold text-light mb-6">Monthly Income vs Expenses</h3>
+            <div class="w-full flex-1 min-h-[300px] relative">
+                <canvas id="incomeBarChart" data-url="{% url 'monthly_income_data' %}"></canvas>
+            </div>
+        </div>
+
+        <!-- Income by Source Chart -->
+        <div class="glass-card p-6 flex flex-col">
+            <h3 class="text-lg font-bold text-light mb-6">Income by Source</h3>
+            <div class="w-full flex-1 min-h-[300px] relative">
+                <canvas id="sourceStackedChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Chart Defaults
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.font.family = 'Inter';
+
+        // Monthly Breakdown Bar Chart
+        const barCtx = document.getElementById("incomeBarChart");
+        const dataUrl = barCtx.getAttribute('data-url');
+
+        let barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: [], // Will be filled
+                        backgroundColor: '#9d4edd', // Neon Purple
+                        borderRadius: 4,
+                        borderWidth: 0,
+                        barThickness: 20
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [], // Will be filled
+                        backgroundColor: '#ef4444', // Red
+                        borderRadius: 4,
+                        borderWidth: 0,
+                        barThickness: 20
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { color: '#94A3B8', boxWidth: 10, font: { size: 11 } } },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 17, 24, 0.9)',
+                        titleColor: '#F8FAFC',
+                        bodyColor: '#F8FAFC',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Income by Source Chart
+        const sourceCtx = document.getElementById("sourceStackedChart");
+        let sourceChart = new Chart(sourceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { color: '#94A3B8', boxWidth: 10, font: { size: 11 } } },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 17, 24, 0.9)',
+                        titleColor: '#F8FAFC',
+                        bodyColor: '#F8FAFC',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, beginAtZero: true }
+                }
+            }
+        });
+
+        // Fetch Data
+        if (dataUrl) {
+            fetch(dataUrl)
+                .then(res => res.json())
+                .then(data => {
+                    // Update labels
+                    if (data.labels) {
+                        barChart.data.labels = data.labels;
+                        sourceChart.data.labels = data.labels;
+                    }
+
+                    // Update Income vs Expenses chart
+                    if (data.monthly_income_data) {
+                        barChart.data.datasets[0].data = data.monthly_income_data;
+                    }
+                    if (data.monthly_expense_data) {
+                        barChart.data.datasets[1].data = data.monthly_expense_data;
+                    }
+                    barChart.update();
+
+                    // Update Income by Source chart
+                    if (data.source_data) {
+                        const colors = ['#2dd4bf', '#a855f7', '#f59e0b', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f43f5e'];
+                        let i = 0;
+                        const datasets = [];
+                        for (const [source, sourceValues] of Object.entries(data.source_data)) {
+                            datasets.push({
+                                label: source,
+                                data: sourceValues,
+                                backgroundColor: colors[i % colors.length],
+                                borderRadius: 4,
+                                borderWidth: 0
+                            });
+                            i++;
+                        }
+                        sourceChart.data.datasets = datasets;
+                        sourceChart.update();
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    });
+</script>
+{% endblock js %}

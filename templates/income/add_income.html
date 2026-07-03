@@ -1,0 +1,70 @@
+{% extends 'base.html' %} 
+
+{% block title %}Add Income{% endblock %}
+{% block page_title %}Add Income{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-[#1A1A24] border border-white/5 rounded-lg px-6 py-4 mb-6">
+        <ol class="flex text-sm text-muted">
+            <li>
+                <a href="{% url 'income' %}" class="text-primary hover:text-white transition-colors">Income</a>
+            </li>
+            <li class="mx-2">/</li>
+            <li class="text-light" aria-current="page">Add Income</li>
+        </ol>
+    </nav>
+
+    <!-- Main Form Card -->
+    <div class="bg-[#0A0A0F] border border-white/10 rounded-lg p-6 md:p-8">
+        <form action="{% url 'add-income' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="flex flex-col space-y-2">
+                <label for="amount" class="text-sm font-medium text-light">Amount</label>
+                <input type="text" id="amount" name="amount" value="{{values.amount}}" 
+                       class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all" />
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <label for="description" class="text-sm font-medium text-light">Description</label>
+                <input type="text" id="description" name="description" value="{{values.description}}" 
+                       class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all" />
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <label for="source" class="text-sm font-medium text-light">Sources</label>
+                <select id="source" name="source" 
+                        class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all appearance-none cursor-pointer custom-select">
+                    {% for source in sources %}
+                    <option value="{{source.name}}">{{source.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <label for="income_date" class="text-sm font-medium text-light">Date of Income</label>
+                <input type="date" id="income_date" name="income_date" 
+                       class="w-full bg-[#1A1A24] border border-white/10 rounded-md py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]" />
+            </div>
+
+            <div class="pt-4">
+                <input type="submit" value="Submit" 
+                       class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-8 py-2.5 rounded-md font-medium transition-all shadow-lg shadow-primary/25 cursor-pointer" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Custom select arrow for dark theme */
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+</style>
+{% endblock %}

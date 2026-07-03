@@ -1,0 +1,244 @@
+/* "Dark Finance Pro" Ultra-Modern Neon Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-dark: #050508;
+  --surface: #0a0a0f;
+  --surface-elevated: rgba(15, 15, 20, 0.7);
+  --accent-primary: #9d4edd;
+  --accent-secondary: #00f5d4;
+  --accent-success: #06d6a0;
+  --accent-danger: #ef476f;
+  --text-primary: #FFFFFF;
+  --text-muted: #8d99ae;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated Ambient Orbs Background */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  width: 70vw;
+  height: 70vw;
+  max-width: 800px;
+  max-height: 800px;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: -1;
+  opacity: 0.4;
+  animation: float 25s infinite ease-in-out alternate;
+  pointer-events: none;
+}
+
+body::before {
+  background: var(--accent-primary);
+  top: -20%;
+  left: -20%;
+}
+
+body::after {
+  background: var(--accent-secondary);
+  bottom: -20%;
+  right: -20%;
+  animation-delay: -12.5s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(15vw, 10vh) scale(1.1); }
+  100% { transform: translate(-10vw, 20vh) scale(0.9); }
+}
+
+/* Tabular Nums for Finance Data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Typography Enhancements */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Neon Text Glows */
+.neon-text-primary {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(157, 78, 221, 0.8), 0 0 20px rgba(157, 78, 221, 0.4);
+}
+.neon-text-success {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(6, 214, 160, 0.8), 0 0 20px rgba(6, 214, 160, 0.4);
+}
+.neon-text-danger {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(239, 71, 111, 0.8), 0 0 20px rgba(239, 71, 111, 0.4);
+}
+.neon-text-secondary {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 245, 212, 0.8), 0 0 20px rgba(0, 245, 212, 0.4);
+}
+
+/* Deep Glassmorphism Utilities */
+.glass-card {
+  background: rgba(10, 10, 15, 0.65);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  border-radius: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Fluid Micro-Animations on Hover */
+.hover-glow {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-glow:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(157, 78, 221, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(157, 78, 221, 0.4);
+  background: rgba(15, 15, 25, 0.8);
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(157, 78, 221, 0.3);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(157, 78, 221, 0.8);
+}
+
+/* Sidebar Toggle Transition */
+#sidebar {
+  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow-x: hidden;
+  white-space: nowrap;
+  background: rgba(10, 10, 15, 0.6);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+#sidebar.w-16 .sidebar-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#sidebar.w-16 .sidebar-scroll::-webkit-scrollbar {
+    display: none;
+}
+#sidebar.w-16 .nav-link {
+    justify-content: center;
+}
+#sidebar.w-64 .sidebar-text {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.1s;
+}
+#sidebar.w-16 .sidebar-text {
+  opacity: 0;
+  visibility: hidden;
+  display: none;
+}
+#sidebar.w-16 .logo-container {
+    width: 2.75rem;
+    height: 2.75rem;
+    transition: all 0.3s ease;
+}
+#sidebar.w-16 .logo-image {
+    width: 2rem;
+    height: 2rem;
+    transition: all 0.3s ease;
+}
+#sidebar.w-16 .logo-wrapper {
+    justify-content: center;
+    width: 100%;
+}
+#main-content {
+  transition: margin-left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@media (max-width: 1024px) {
+  #main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  top: 80px;
+  left: 300px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background: rgba(20, 20, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--accent-primary);
+  color: var(--text-primary);
+  padding: 1.25rem 1.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+  animation: slideInTop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideInTop {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+/* Ultra-Modern Input Fields */
+.form-input {
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.5rem;
+}
+.form-input:focus {
+  outline: none;
+  border-color: transparent;
+  border-bottom: 2px solid var(--accent-secondary);
+  box-shadow: 0 10px 25px rgba(0, 245, 212, 0.15), inset 0 -20px 20px -20px rgba(0, 245, 212, 0.2);
+  background: rgba(15, 15, 20, 0.8);
+}
+
+/* Pulse animation utility */
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .8; transform: scale(0.98); }
+}

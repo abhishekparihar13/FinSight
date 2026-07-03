@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Expense Forecast & Insights{% endblock %}
+{% block page_title %}Forecast & Insights{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+  <!-- Top Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl lg:text-3xl font-semibold text-light">AI Expense Forecast</h1>
+    <div
+      class="text-sm text-muted bg-surface-elevated px-3 py-1.5 rounded-full border border-white/5 flex items-center gap-2">
+      <i data-lucide="calendar" class="w-4 h-4"></i>
+      Next 7 Days
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Next 7 Days Total -->
+    <div
+      class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-primary/50 transition-colors">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <i data-lucide="trending-up" class="w-12 h-12 text-primary"></i>
+      </div>
+      <p class="text-sm text-muted font-medium mb-1">Predicted Next 7 Days</p>
+      <h3 class="text-2xl font-bold text-light flex items-center gap-2">
+        <span class="text-primary">&#8377; </span>
+        <span class="count-up">{{ total_forecasted_expenses|floatformat:2 }}</span>
+      </h3>
+    </div>
+
+    <!-- Highest Category -->
+    <div
+      class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-danger/50 transition-colors">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <i data-lucide="pie-chart" class="w-12 h-12 text-danger"></i>
+      </div>
+      <p class="text-sm text-muted font-medium mb-1">Highest Category</p>
+      <h3 class="text-2xl font-bold text-light capitalize">{{ highest_category }}</h3>
+    </div>
+
+    <!-- Trend -->
+    <div
+      class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-secondary/50 transition-colors">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <i data-lucide="activity" class="w-12 h-12 text-secondary"></i>
+      </div>
+      <p class="text-sm text-muted font-medium mb-1">7-Day Trend</p>
+      <h3
+        class="text-2xl font-bold flex items-center gap-2 {% if trend_percentage > 0 %}text-danger{% elif trend_percentage < 0 %}text-success{% else %}text-muted{% endif %}">
+        {% if trend_percentage > 0 %}
+        <i data-lucide="arrow-up-right" class="w-6 h-6"></i>
+        {% elif trend_percentage < 0 %} <i data-lucide="arrow-down-right" class="w-6 h-6"></i>
+          {% else %}
+          <i data-lucide="minus" class="w-6 h-6"></i>
+          {% endif %}
+          {{ trend_percentage|floatformat:1 }}%
+      </h3>
+    </div>
+
+    <!-- Avg Daily -->
+    <div
+      class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-success/50 transition-colors">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <i data-lucide="calendar-days" class="w-12 h-12 text-success"></i>
+      </div>
+      <p class="text-sm text-muted font-medium mb-1">Avg Daily Forecast</p>
+      <h3 class="text-2xl font-bold text-light flex items-center gap-2">
+        <span class="text-success">&#8377;</span><span class="count-up">{{ avg_daily_predicted|floatformat:2 }}</span>
+      </h3>
+    </div>
+  </div>
+
+  <!-- AI Insights Section -->
+  <div
+    class="bg-gradient-to-br from-surface-elevated to-[#1e1e2d] rounded-xl p-6 border border-primary/20 shadow-[0_0_15px_rgba(124,58,237,0.1)]">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="bg-primary/20 p-2 rounded-lg">
+        <i data-lucide="sparkles" class="w-5 h-5 text-primary"></i>
+      </div>
+      <h2 class="text-lg font-semibold text-light">AI Spending Insights</h2>
+    </div>
+    <ul class="space-y-3">
+      {% for insight in insights %}
+      <li class="flex items-start gap-3 text-sm text-muted">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-secondary shrink-0 mt-0.5"></i>
+        <span>{{ insight }}</span>
+      </li>
+      {% empty %}
+      <li class="text-sm text-muted">Gathering more data to provide insights...</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Main Chart Section -->
+  <div class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg">
+    <h2 class="text-lg font-medium text-light mb-4">Historical & Forecasted Spending</h2>
+    <div id="forecast-error-container" class="text-danger"></div>
+    <div class="relative h-96 w-full">
+      <canvas id="forecastChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Secondary Row (Pie Chart & Category Table) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Pie Chart -->
+    <div class="bg-surface-elevated rounded-xl p-5 border border-white/5 shadow-lg lg:col-span-1">
+      <h2 class="text-lg font-medium text-light mb-4">Forecast by Category</h2>
+      <div id="pie-error-container" class="text-danger"></div>
+      <div class="relative h-64 w-full flex justify-center">
+        <canvas id="categoryPieChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Category Table -->
+    <div
+      class="bg-surface-elevated rounded-xl border border-white/5 shadow-lg lg:col-span-2 overflow-hidden flex flex-col">
+      <div class="p-5 border-b border-white/5">
+        <h2 class="text-lg font-medium text-light">Category Breakdown (Next 7 Days)</h2>
+      </div>
+      <div class="overflow-x-auto flex-1">
+        <table class="w-full text-left text-sm text-light">
+          <thead class="text-xs font-semibold text-muted bg-white/5 border-b border-white/5">
+            <tr>
+              <th scope="col" class="px-6 py-3">Category</th>
+              <th scope="col" class="px-6 py-3 text-right">Predicted Amount</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for category, amount in category_forecasts.items %}
+            {% if amount > 0 %}
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="px-6 py-4 font-medium capitalize">{{ category }}</td>
+              <td class="px-6 py-4 text-right tabular-nums text-primary font-medium">&#8377;{{ amount|floatformat:2 }}
+              </td>
+            </tr>
+            {% endif %}
+            {% empty %}
+            <tr>
+              <td colspan="2" class="px-6 py-4 text-center text-muted">No categorical data available.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% block js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    {% if not messages and chart_labels %}
+    try {
+      // Common Chart.js Defaults for Dark Mode
+      Chart.defaults.color = '#94a3b8';
+      Chart.defaults.font.family = "'Inter', sans-serif";
+
+      // Destroy existing chart if it exists
+      let existingForecastChart = Chart.getChart('forecastChart');
+      if (existingForecastChart) {
+        existingForecastChart.destroy();
+      }
+
+      // Main Forecast Chart
+      const ctx = document.getElementById('forecastChart').getContext('2d');
+
+      // Gradients
+      const gradientHistoric = ctx.createLinearGradient(0, 0, 0, 400);
+      gradientHistoric.addColorStop(0, 'rgba(124, 58, 237, 0.4)'); // Primary
+      gradientHistoric.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
+
+      const gradientForecast = ctx.createLinearGradient(0, 0, 0, 400);
+      gradientForecast.addColorStop(0, 'rgba(239, 71, 111, 0.4)'); // Neon Danger
+      gradientForecast.addColorStop(1, 'rgba(239, 71, 111, 0.0)');
+
+  const chartLabels = JSON.parse('{{ chart_labels|escapejs }}');
+  const historicExpenses = JSON.parse('{{ historic_expenses|escapejs }}');
+  const forecastExpenses = JSON.parse('{{ forecast_expenses|escapejs }}');
+  const confLower = JSON.parse('{{ conf_lower|escapejs }}');
+  const confUpper = JSON.parse('{{ conf_upper|escapejs }}');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartLabels,
+      datasets: [
+        {
+          label: 'Historic Spending',
+          data: historicExpenses,
+          borderColor: '#9d4edd', // Neon Primary
+          backgroundColor: gradientHistoric,
+          borderWidth: 4,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Forecast Mean',
+          data: forecastExpenses,
+          borderColor: '#ef476f', // Neon Danger
+          borderWidth: 4,
+          borderDash: [5, 5],
+          fill: false,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Confidence Upper',
+          data: confUpper,
+          borderColor: 'transparent',
+          backgroundColor: 'transparent',
+          fill: false,
+          pointRadius: 0,
+          pointHitRadius: 0
+        },
+        {
+          label: 'Confidence Band',
+          data: confLower,
+          borderColor: 'transparent',
+          backgroundColor: 'rgba(239, 71, 111, 0.15)', // Light Neon Red Area
+          fill: '-1', // Fill to previous dataset (Upper)
+          pointRadius: 0,
+          pointHitRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            filter: function (item, chart) {
+              return !item.text.includes('Confidence');
+            },
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1A1A24',
+          titleColor: '#FFFFFF',
+          bodyColor: '#94A3B8',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: function (context) {
+              if (context.dataset.label.includes('Confidence')) {
+                return null;
+              }
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(context.parsed.y);
+              }
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { maxRotation: 45, minRotation: 45 }
+        },
+        y: {
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return '' + value;
+            }
+          }
+        }
+      }
+    }
+  });
+  document.getElementById('forecast-error-container').innerText = '';
+    } catch (e) {
+    document.getElementById('forecast-error-container').innerText = 'Error drawing main chart: ' + e.message;
+    console.error('Forecast Chart Error:', e);
+  }
+
+  try {
+    // Destroy existing chart if it exists
+    let existingPieChart = Chart.getChart('categoryPieChart');
+    if (existingPieChart) {
+      existingPieChart.destroy();
+    }
+
+    // Category Pie Chart
+    const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
+    const catLabels = JSON.parse('{{ cat_labels|escapejs }}');
+    const catValues = JSON.parse('{{ cat_values|escapejs }}');
+
+  // Filter out 0 values for better pie chart
+  const activeCatLabels = [];
+  const activeCatValues = [];
+  for (let i = 0; i < catValues.length; i++) {
+    if (catValues[i] > 0) {
+      activeCatLabels.push(catLabels[i]);
+      activeCatValues.push(catValues[i]);
+    }
+  }
+
+  if (activeCatValues.length > 0) {
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: activeCatLabels,
+        datasets: [{
+          data: activeCatValues,
+          backgroundColor: [
+            '#7C3AED', '#06B6D4', '#10B981', '#F59E0B', '#EF4444',
+            '#EC4899', '#8B5CF6', '#14B8A6', '#F97316', '#6366F1',
+            '#3B82F6', '#84CC16', '#F43F5E', '#D946EF', '#0EA5E9',
+          ],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, boxWidth: 8 }
+          },
+          tooltip: {
+            backgroundColor: '#1A1A24',
+            titleColor: '#FFFFFF',
+            bodyColor: '#94A3B8',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            callbacks: {
+              label: function (context) {
+                let label = context.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed !== null) {
+                  label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(context.parsed);
+                }
+                return label;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  document.getElementById('pie-error-container').innerText = '';
+    } catch (e) {
+    document.getElementById('pie-error-container').innerText = 'Error drawing pie chart: ' + e.message;
+    console.error('Pie Chart Error:', e);
+  }
+  {% endif %}
+});
+</script>
+{% endblock js %}
+{% endblock content %}

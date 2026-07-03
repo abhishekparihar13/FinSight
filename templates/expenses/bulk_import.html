@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Bulk Import Expenses{% endblock %}
+{% block page_title %}Bulk Import Expenses{% endblock %}
+
+{% block content %}
+<div class="max-w-[600px] mx-auto mt-8">
+    <div class="mb-6">
+        <a href="{% url 'expenses' %}" class="flex items-center gap-2 text-muted hover:text-light transition-colors text-sm font-medium w-fit">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Expenses
+        </a>
+    </div>
+
+    <div class="glass-card p-8 sm:p-10 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full pointer-events-none"></div>
+
+        <div class="relative z-10">
+            <h2 class="text-2xl font-bold text-light mb-2 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                    <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                </div>
+                Import Expenses
+            </h2>
+            <p class="text-muted text-sm mb-8">Upload a .CSV or .XLSX file to bulk import expenses.</p>
+
+
+
+            <!-- Instructions -->
+            <div class="mb-8 p-4 rounded-xl bg-surface-elevated/50 border border-white/5">
+                <h3 class="text-sm font-semibold text-light mb-3 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-primary"></i> File Requirements
+                </h3>
+                <ul class="text-sm text-muted space-y-2 list-disc list-inside">
+                    <li>Required columns: <span class="text-light font-mono bg-white/5 px-1.5 py-0.5 rounded">date</span>, <span class="text-light font-mono bg-white/5 px-1.5 py-0.5 rounded">description</span>, <span class="text-light font-mono bg-white/5 px-1.5 py-0.5 rounded">amount</span>.</li>
+                    <li>Optional column: <span class="text-light font-mono bg-white/5 px-1.5 py-0.5 rounded">category</span>. (If omitted or empty, AI will auto-categorize it!)</li>
+                    <li><span class="text-light">date</span> should be in a standard format (e.g., YYYY-MM-DD or MM/DD/YYYY).</li>
+                    <li><span class="text-light">amount</span> must be a positive number.</li>
+                </ul>
+            </div>
+
+            <!-- Upload Form -->
+            <form action="{% url 'bulk-import-expenses' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-6">
+                    <label for="file-upload" class="relative border-2 border-dashed border-white/20 hover:border-primary/50 transition-colors rounded-xl p-10 text-center bg-surface-elevated/30 group cursor-pointer block">
+                        <input type="file" name="file" id="file-upload" accept=".csv, .xlsx, .xls" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateFileName(this)">
+                        <div class="flex flex-col items-center justify-center gap-3 pointer-events-none">
+                            <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <i data-lucide="file-spreadsheet" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <p class="text-light font-medium" id="file-name-display">Click or drag file to upload</p>
+                                <p class="text-muted text-xs mt-1">Supports .CSV, .XLSX</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" id="import-btn" class="submit-btn w-full py-3.5 px-4 bg-gradient-to-r from-primary to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white font-medium rounded-lg transition-all shadow-lg shadow-primary/25 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark flex justify-center items-center gap-2">
+                    <i data-lucide="upload" class="w-4 h-4"></i> Start Import
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+function updateFileName(input) {
+    const display = document.getElementById('file-name-display');
+    if (input.files && input.files.length > 0) {
+        display.textContent = input.files[0].name;
+        display.classList.add('text-primary');
+    } else {
+        display.textContent = 'Click or drag file to upload';
+        display.classList.remove('text-primary');
+    }
+}
+</script>
+{% endblock js %}

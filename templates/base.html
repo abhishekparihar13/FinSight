@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>FinSight | {% block title %}{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0A0A0F',
+                        surface: '#111118',
+                        'surface-elevated': '#1A1A24',
+                        primary: '#7C3AED',
+                        secondary: '#06B6D4',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        muted: '#94A3B8',
+                        light: '#FFFFFF',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={% now 'U' %}">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block link %}{% endblock link %}
+    {% block css %}{% endblock css %}
+    {% block toast_position %}{% endblock %}
+</head>
+<body class="bg-dark text-light font-sans h-screen overflow-hidden flex">
+
+    <!-- Sidebar -->
+    {% include "partials/_sidebar.html" %}
+
+    <!-- Main Content -->
+    <div id="main-content" class="flex-1 flex flex-col transition-all duration-300 h-full relative w-full overflow-hidden">
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+        <!-- Navbar -->
+        {% include "navbar.html" %}
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto p-6 lg:p-8">
+            <!-- Django Messages fallback (to be replaced by custom toast JS where possible, but keeping Django messages tag for compatibility) -->
+            <!-- {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg bg-surface-elevated border-l-4 
+                            {% if message.tags == 'error' %}border-danger
+                            {% elif message.tags == 'success' %}border-success
+                            {% else %}border-primary{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %} -->
+            <!-- {% if messages %}
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        {% for message in messages %}
+                            showToast("{{ message|escapejs }}", "{{ message.tags }}");
+                        {% endfor %}
+                    });
+                </script>
+            {% endif %} -->
+
+            {% block content %}{% endblock content %}
+        </main>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container">
+        {% if messages %}
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        {% for message in messages %}
+                            showToast("{{ message|escapejs }}", "{{ message.tags }}");
+                        {% endfor %}
+                    });
+                </script>
+            {% endif %}
+    </div>
+
+    <!-- Global Scripts -->
+    <!-- Keeping jQuery for existing JS compatibility -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Number Animation (CountUp effect)
+            const animateNumbers = () => {
+                const elements = document.querySelectorAll('.count-up');
+                elements.forEach(el => {
+                    // Extract numbers keeping decimals
+                    const numStr = el.innerText.replace(/,/g, '');
+                    const target = parseFloat(numStr);
+                    if (isNaN(target)) return;
+                    
+                    const isCurrency = el.innerText.includes('$') || el.innerText.includes('€') || el.innerText.includes('£') || el.innerText.includes('₹');
+                    const hasDecimals = numStr.includes('.') || target % 1 !== 0;
+                    
+                    const duration = 400; // ms
+                    const startTime = performance.now();
+                    
+                    const updateNumber = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const current = target * progress;
+                        
+                        let displayValue = hasDecimals ? current.toFixed(2) : Math.floor(current).toString();
+                        // Format with commas
+                        displayValue = parseFloat(displayValue).toLocaleString(undefined, {
+                            minimumFractionDigits: hasDecimals ? 2 : 0,
+                            maximumFractionDigits: hasDecimals ? 2 : 0
+                        });
+                        
+                        el.innerText = isCurrency ? displayValue : displayValue; // Prefix handled in HTML usually
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(updateNumber);
+                        } else {
+                            el.innerText = hasDecimals ? target.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : target.toLocaleString();
+                        }
+                    };
+                    requestAnimationFrame(updateNumber);
+                });
+            };
+            
+            animateNumbers();
+        });
+
+        // Toast Notification System
+        function showToast(message, type='info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            if(type === 'success') toast.style.borderLeftColor = 'var(--accent-success)';
+            if(type === 'error') toast.style.borderLeftColor = 'var(--accent-danger)';
+            
+            toast.innerText = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    
+    {% block js %}{% endblock js %}
+    
+    <!-- Preserving main.js reference -->
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

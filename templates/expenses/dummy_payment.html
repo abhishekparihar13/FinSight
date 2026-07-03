@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complete Payment{% endblock %}
+{% block page_title %}Secure Payment{% endblock %}
+
+{% block content %}
+<div class="max-w-[480px] mx-auto mt-8">
+    <div class="mb-6">
+        <a href="{% url 'recurring_expenses' %}" class="flex items-center gap-2 text-muted hover:text-light transition-colors text-sm font-medium w-fit">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Cancel & Return
+        </a>
+    </div>
+
+    <div class="glass-card p-8 sm:p-10 relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full pointer-events-none"></div>
+
+        <div class="relative z-10">
+            <div class="flex justify-between items-start mb-8">
+                <h2 class="text-2xl font-bold text-light flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    Secure Payment
+                </h2>
+                <div class="flex flex-col items-end">
+                    <span class="text-xs font-semibold text-primary uppercase tracking-wider mb-1">Powered by</span>
+                    <span class="text-sm font-bold text-white tracking-wide">FinSight</span>
+                </div>
+            </div>
+
+            <!-- Expense Summary -->
+            <div class="bg-surface-elevated border border-white/5 rounded-2xl p-6 mb-8 text-center">
+                <p class="text-muted text-sm mb-1">Amount Due</p>
+                <h1 class="text-4xl font-bold text-white mb-4">&#8377;{{ pending.amount }}</h1>
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-muted">Description</span>
+                        <span class="text-light font-medium">{{ pending.description }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-muted">Category</span>
+                        <span class="text-light font-medium">{{ pending.category }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-6 p-1 bg-surface-elevated rounded-lg">
+                <button id="tab-upi" onclick="switchTab('upi')" class="flex-1 py-2 text-sm font-medium rounded-md bg-primary text-white transition-all">UPI</button>
+                <button id="tab-card" onclick="switchTab('card')" class="flex-1 py-2 text-sm font-medium rounded-md text-muted hover:text-light transition-all">Card</button>
+            </div>
+
+            <!-- Payment Forms Container -->
+            <div class="mb-8 min-h-[160px]">
+                <!-- UPI Form -->
+                <div id="form-upi" class="space-y-4 transition-opacity duration-300">
+                    <div class="relative">
+                        <input type="text" id="upi-id" class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface border border-white/10 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" ">
+                        <label for="upi-id" class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Enter UPI ID (e.g. name@oksbi)</label>
+                    </div>
+                    <button type="button" id="btn-verify" onclick="verifyUPI()" class="w-full py-3 px-4 bg-surface hover:bg-surface-elevated text-primary border border-primary/30 rounded-lg text-sm font-semibold transition-all flex justify-center items-center gap-2">
+                        <span>Verify UPI ID</span>
+                        <i data-lucide="check-circle" id="verify-icon" class="w-4 h-4 hidden text-success"></i>
+                    </button>
+                </div>
+
+                <!-- Card Form -->
+                <div id="form-card" class="space-y-4 hidden transition-opacity duration-300">
+                    <div class="relative">
+                        <input type="text" maxlength="19" class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface border border-white/10 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" ">
+                        <label class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">Card Number</label>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="relative flex-1">
+                            <input type="text" maxlength="5" class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface border border-white/10 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" ">
+                            <label class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">MM/YY</label>
+                        </div>
+                        <div class="relative flex-1">
+                            <input type="password" maxlength="3" class="form-input block w-full px-4 pt-6 pb-2 text-light bg-surface border border-white/10 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary peer" placeholder=" ">
+                            <label class="absolute text-muted duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3">CVV</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actual Form to Submit -->
+            <form action="{% url 'pay-pending' pending.id %}" method="post" id="payment-form">
+                {% csrf_token %}
+                <input type="hidden" id="amountField" value="{{ pending.amount }}">
+                <input type="hidden" id="category-input" value="{{ pending.category }}">
+                <input type="hidden" name="force_save" id="force-save-input" value="0">
+                <button type="submit" class="w-full py-4 px-4 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#10B981]/20 flex items-center justify-center gap-2 text-lg">
+                    <i data-lucide="lock" class="w-5 h-5 opacity-80"></i>
+                    Pay &#8377;{{ pending.amount }}
+                </button>
+            </form>
+
+            <div class="mt-6 flex justify-center items-center gap-2 text-muted text-xs">
+                <i data-lucide="shield" class="w-3 h-3"></i>
+                <span>Your payment info is safely simulated</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Limit Preview Modal -->
+<div id="limit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+    <div class="relative w-full max-w-md">
+        <button id="modal-close-btn"
+            class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-muted hover:text-light z-10">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+        <div id="modal-content"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function switchTab(tab) {
+        const upiBtn = document.getElementById('tab-upi');
+        const cardBtn = document.getElementById('tab-card');
+        const upiForm = document.getElementById('form-upi');
+        const cardForm = document.getElementById('form-card');
+
+        if (tab === 'upi') {
+            upiBtn.className = "flex-1 py-2 text-sm font-medium rounded-md bg-primary text-white transition-all";
+            cardBtn.className = "flex-1 py-2 text-sm font-medium rounded-md text-muted hover:text-light transition-all";
+            upiForm.classList.remove('hidden');
+            cardForm.classList.add('hidden');
+        } else {
+            cardBtn.className = "flex-1 py-2 text-sm font-medium rounded-md bg-primary text-white transition-all";
+            upiBtn.className = "flex-1 py-2 text-sm font-medium rounded-md text-muted hover:text-light transition-all";
+            cardForm.classList.remove('hidden');
+            upiForm.classList.add('hidden');
+        }
+    }
+
+    function verifyUPI() {
+        const btn = document.getElementById('btn-verify');
+        const icon = document.getElementById('verify-icon');
+        const input = document.getElementById('upi-id');
+        
+        if (!input.value) return;
+
+        // Simulate loading
+        btn.querySelector('span').innerText = 'Verifying...';
+        btn.classList.add('opacity-70');
+        icon.classList.add('hidden');
+
+        setTimeout(() => {
+            btn.classList.remove('opacity-70');
+            btn.querySelector('span').innerText = 'Verified';
+            btn.classList.replace('text-primary', 'text-success');
+            btn.classList.replace('border-primary/30', 'border-success/30');
+            icon.classList.remove('hidden');
+        }, 1000);
+    }
+
+    // Limit Preview Logic
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const paymentForm = document.getElementById('payment-form');
+    const limitModal = document.getElementById('limit-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    paymentForm.addEventListener('submit', function (e) {
+        const forceInput = document.getElementById('force-save-input');
+        if (forceInput && forceInput.value === '1') return;
+
+        e.preventDefault();
+        const amount = document.getElementById('amountField').value;
+        const category = document.getElementById('category-input').value;
+
+        if (category && category.toLowerCase().includes('investment')) {
+            paymentForm.submit();
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('amount', amount);
+
+        fetch('{% url "check-limit-preview" %}', {
+            method: 'POST', body: formData,
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const allowed = data.allow_overspending;
+            let isBlocked = false;
+            let isWarning = false;
+            let modalHtml = '';
+
+            if (data.tier_2_blocked) {
+                isBlocked = true;
+                modalHtml = `
+                    <div class="flex flex-col gap-4 md:flex-row">
+                        <div class="flex-1 rounded-2xl border-2 border-red-500/60 bg-red-950/40 p-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-6 h-6 rounded-full border-2 border-red-400 flex items-center justify-center text-red-400 text-sm font-bold">✕</span>
+                                <span class="text-red-400 font-bold text-base">Transaction Blocked</span>
+                            </div>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                This expense of <span class="font-semibold text-white">₹${amount}</span> would exceed your total available funds. You have <span class="font-semibold text-white">₹${data.cumulative_savings.toFixed(2)}</span> available across income and savings.
+                            </p>
+                            <button disabled class="mt-5 w-full py-2.5 rounded-xl bg-gray-700/60 text-gray-500 font-semibold text-sm cursor-not-allowed">
+                                Pay — Blocked
+                            </button>
+                        </div>
+                    </div>`;
+            } else if (data.tier_1_warning) {
+                if (!allowed) {
+                    isBlocked = true;
+                    modalHtml = `
+                        <div class="flex flex-col gap-4 md:flex-row">
+                            <div class="flex-1 rounded-2xl border-2 border-red-500/60 bg-red-950/40 p-6">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-6 h-6 rounded-full border-2 border-red-400 flex items-center justify-center text-red-400 text-sm font-bold">✕</span>
+                                    <span class="text-red-400 font-bold text-base">Transaction Blocked</span>
+                                </div>
+                                <p class="text-sm text-gray-300 leading-relaxed">
+                                    You have exceeded this month's income. Overspending is disabled. Enable it in Savings -> Smart Spending Control to draw from savings.
+                                </p>
+                                <button disabled class="mt-5 w-full py-2.5 rounded-xl bg-gray-700/60 text-gray-500 font-semibold text-sm cursor-not-allowed">
+                                    Pay — Blocked
+                                </button>
+                            </div>
+                        </div>`;
+                } else {
+                    isWarning = true;
+                    modalHtml = `
+                        <div class="flex flex-col gap-4 md:flex-row">
+                            <div class="flex-1 rounded-2xl border-2 border-yellow-500/60 bg-yellow-950/30 p-6">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="text-yellow-400 text-xl">⚠</span>
+                                    <span class="text-yellow-400 font-bold text-base">Warning</span>
+                                </div>
+                                <p class="text-sm text-gray-300 leading-relaxed">
+                                    This expense exceeds your income for this month. You will be drawing <span class="font-bold text-yellow-300">₹${data.drawdown_amount.toFixed(2)}</span> from your savings. Available savings: <span class="font-semibold text-white">₹${data.cumulative_savings.toFixed(2)}</span>. Do you want to continue?
+                                </p>
+                                <div class="flex gap-3 mt-5">
+                                    <button type="button" class="w-full py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-light font-semibold text-sm transition-all" onclick="document.getElementById('limit-modal').classList.add('hidden');">
+                                        Cancel
+                                    </button>
+                                    <button id="confirm-save-btn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-800 hover:from-yellow-700 hover:to-yellow-900 text-white font-semibold text-sm transition-all">
+                                        Continue Anyway
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            } else if (data.breaches && data.breaches.length > 0) {
+                const breachText = data.breaches.join(' and ');
+                if (!allowed) {
+                    isBlocked = true;
+                    modalHtml = `
+                        <div class="flex flex-col gap-4 md:flex-row">
+                            <div class="flex-1 rounded-2xl border-2 border-red-500/60 bg-red-950/40 p-6">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-6 h-6 rounded-full border-2 border-red-400 flex items-center justify-center text-red-400 text-sm font-bold">✕</span>
+                                    <span class="text-red-400 font-bold text-base">Payment Blocked</span>
+                                </div>
+                                <p class="text-sm text-gray-300 leading-relaxed">
+                                    This would exceed your <span class="font-semibold text-white">${breachText}</span> limit${data.breaches.length > 1 ? 's' : ''}.
+                                    To allow overspending, enable it in
+                                    <a href="/savings/dashboard/" class="text-purple-400 underline">Savings → Spending Control</a>.
+                                </p>
+                                <button disabled class="mt-5 w-full py-2.5 rounded-xl bg-gray-700/60 text-gray-500 font-semibold text-sm cursor-not-allowed">
+                                    Pay — Blocked
+                                </button>
+                            </div>
+                        </div>`;
+                } else {
+                    isWarning = true;
+                    modalHtml = `
+                        <div class="flex flex-col gap-4 md:flex-row">
+                            <div class="flex-1 rounded-2xl border-2 border-yellow-500/60 bg-yellow-950/30 p-6">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="text-yellow-400 text-xl">⚠</span>
+                                    <span class="text-yellow-400 font-bold text-base">Limit Warning</span>
+                                </div>
+                                <p class="text-sm text-gray-300 leading-relaxed">
+                                    This expense exceeds your <span class="font-semibold text-white">${breachText}</span> limit${data.breaches.length > 1 ? 's' : ''}.
+                                    The overspent amount <span class="font-bold text-yellow-300">will be deducted from your savings</span>.
+                                    You can still pay it.
+                                </p>
+                                <div class="flex gap-3 mt-5">
+                                    <button type="button" class="w-full py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-light font-semibold text-sm transition-all" onclick="document.getElementById('limit-modal').classList.add('hidden');">
+                                        Cancel
+                                    </button>
+                                    <button id="confirm-save-btn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-semibold text-sm transition-all">
+                                        Pay Anyway
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
+
+            if (!isBlocked && !isWarning) {
+                paymentForm.submit();
+                return;
+            }
+
+            modalContent.innerHTML = modalHtml;
+
+            if (isWarning) {
+                document.getElementById('confirm-save-btn').addEventListener('click', () => {
+                    document.getElementById('force-save-input').value = '1';
+                    limitModal.classList.add('hidden');
+                    paymentForm.submit();
+                });
+            }
+
+            limitModal.classList.remove('hidden');
+        })
+        .catch(() => {
+            paymentForm.submit();
+        });
+    });
+
+    document.getElementById('modal-close-btn').addEventListener('click', () => {
+        limitModal.classList.add('hidden');
+    });
+
+    limitModal.addEventListener('click', function(e) {
+        if (e.target === limitModal) limitModal.classList.add('hidden');
+    });
+</script>
+{% endblock js %}

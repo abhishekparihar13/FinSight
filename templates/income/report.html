@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Income-Expense Report{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl lg:text-3xl font-medium text-light mb-8">Income-Expense Report</h1>
+
+
+    <!-- Date Range Form -->
+    <form method="post" action="{% url 'generate-report' %}" class="mb-8">
+        {% csrf_token %}
+        <div class="flex flex-col sm:flex-row gap-6 mb-6">
+            <div class="w-full sm:w-1/2">
+                <label for="start_date" class="block text-sm font-medium text-muted mb-2">Start Date:</label>
+                <input type="date" name="start_date" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]" required value="{{start_date}}">
+            </div>
+            <div class="w-full sm:w-1/2">
+                <label for="end_date" class="block text-sm font-medium text-muted mb-2">End Date:</label>
+                <input type="date" name="end_date" class="w-full bg-[#1A1A24] border border-white/10 rounded-lg py-2.5 px-4 text-light focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all [color-scheme:dark]" required value="{{end_date}}">
+            </div>
+        </div>
+        <button type="submit" id="generate-report" class="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/25">
+            Generate Report
+        </button>
+    </form>
+
+    {% if report_generated %}
+    <hr class="border-white/5 my-10">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <!-- Income Table -->
+        {% if incomes %}
+        <div>
+            <h2 class="text-xl font-medium text-light mb-4">Total Income:</h2>
+            <div class="app-table overflow-x-auto rounded-lg border border-white/5 bg-[#0A0A0F]">
+                <table class="w-full text-left text-sm text-light">
+                    <thead class="text-xs font-semibold bg-[#8B5CF6] text-white border-b border-white/5">
+                        <tr>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Source</th>
+                            <th class="px-6 py-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for income in incomes %}
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 text-muted">{{ income.date }}</td>
+                            <td class="px-6 py-4">{{ income.source }}</td>
+                            <td class="px-6 py-4 tabular-nums">&#8377; {{ income.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Expense Table -->
+        {% if expenses %}
+        <div>
+            <h2 class="text-xl font-medium text-light mb-4">Total Expenses:</h2>
+            <div class="app-table overflow-x-auto rounded-lg border border-white/5 bg-[#0A0A0F]">
+                <table class="w-full text-left text-sm text-light">
+                    <thead class="text-xs font-semibold bg-[#8B5CF6] text-white border-b border-white/5">
+                        <tr>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 text-muted">{{ expense.date }}</td>
+                            <td class="px-6 py-4">{{ expense.category }}</td>
+                            <td class="px-6 py-4 tabular-nums">&#8377; {{ expense.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if total_income is not None and total_expense is not None %}
+    <!-- Savings Calculation -->
+    <div class="bg-[#1A1A24] border border-white/5 rounded-xl p-6 mb-10 max-w-xl">
+        <h2 class="text-xl font-medium text-light mb-4">Savings Summary:</h2>
+        <div class="space-y-3 mb-6">
+            <div class="flex justify-between items-center">
+                <span class="text-muted">Total Income:</span>
+                <span class="text-light tabular-nums font-medium">&#8377; {{ total_income|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-muted">Total Expenses:</span>
+                <span class="text-light tabular-nums font-medium">&#8377; {{ total_expense|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/5 font-bold">
+                <span class="text-light">Total Savings:</span>
+                <span class="{% if savings > 0 %}text-success{% elif savings < 0 %}text-danger{% else %}text-light{% endif %} tabular-nums">&#8377; {% if savings < 0 %} 0 {% else %} {{ savings|floatformat:2 }} {% endif %}</span>
+            </div>
+        </div>
+
+        <div class="bg-[#0A0A0F]/50 rounded-lg p-3">
+            {% if savings > 0 %}
+            <p class="text-success text-sm flex items-center gap-2 m-0"><i data-lucide="check-circle" class="w-4 h-4"></i> You saved money this period.</p>
+            {% elif savings == 0 %}
+            <p class="text-success text-sm flex items-center gap-2 m-0"><i data-lucide="check-circle" class="w-4 h-4"></i> Your income and expenses balanced perfectly.</p>
+            {% else %}
+            <p class="text-danger text-sm flex items-center gap-2 m-0"><i data-lucide="alert-triangle" class="w-4 h-4"></i> You exceeded your expenses than your income this period.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-10">
+        <!-- Income vs Expense Chart -->
+        <div class="w-full">
+            <h2 class="text-xl font-medium text-light mb-4">Income vs Expense:</h2>
+            <div class="bg-[#1A1A24] border border-white/5 rounded-xl p-6 flex justify-center items-center shadow-lg h-[350px]">
+                <div class="relative w-full h-[280px] flex items-center justify-center">
+                    <canvas id="reportBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Breakdown Chart -->
+        {% if incomes %}
+        <div class="w-full">
+            <h2 class="text-xl font-medium text-light mb-4">Income Breakdown:</h2>
+            <div class="bg-[#1A1A24] border border-white/5 rounded-xl p-6 flex justify-center items-center shadow-lg h-[350px]">
+                <div class="relative w-full max-w-[280px] h-[280px] flex items-center justify-center">
+                    <canvas id="incomePieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Expense Breakdown Chart -->
+        {% if expenses %}
+        <div class="w-full">
+            <h2 class="text-xl font-medium text-light mb-4">Expense Breakdown:</h2>
+            <div class="bg-[#1A1A24] border border-white/5 rounded-xl p-6 flex justify-center items-center shadow-lg h-[350px]">
+                <div class="relative w-full max-w-[280px] h-[280px] flex items-center justify-center">
+                    <canvas id="expensePieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Export Options -->
+    <div>
+        <h2 class="text-xl font-medium text-light mb-4">Export Options:</h2>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'export_pdf' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="flex items-center gap-2 bg-[#1A1A24] hover:bg-[#2D2D3B] border border-white/10 text-light px-5 py-2.5 rounded-lg transition-all text-sm font-medium">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Export as PDF
+            </a>
+            <a href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="flex items-center gap-2 bg-[#1A1A24] hover:bg-[#2D2D3B] border border-white/10 text-light px-5 py-2.5 rounded-lg transition-all text-sm font-medium">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export as CSV
+            </a>
+            <a href="{% url 'export_xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="flex items-center gap-2 bg-[#1A1A24] hover:bg-[#2D2D3B] border border-white/10 text-light px-5 py-2.5 rounded-lg transition-all text-sm font-medium">
+                <i data-lucide="table" class="w-4 h-4"></i> Export as XLSX
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block js %}
+{% if report_generated and total_income is not None and total_expense is not None %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#F8FAFC', padding: 20, usePointStyle: true, font: { size: 13 } }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(17, 17, 24, 0.9)',
+                titleColor: '#F8FAFC',
+                bodyColor: '#F8FAFC',
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 6,
+                usePointStyle: true
+            }
+        }
+    };
+
+    const colorPalette = ['#7C3AED', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#8B5CF6', '#14B8A6', '#F97316', '#6366F1'];
+
+    // 1. Overall Income vs Expense (Line Chart)
+    const timelineData = {};
+    
+    {% for income in incomes %}
+    {
+        let dateStr = "{{ income.date|date:'Y-m-d' }}";
+        if (!timelineData[dateStr]) { timelineData[dateStr] = { income: 0, expense: 0 }; }
+        timelineData[dateStr].income += parseFloat("{{ income.amount|default:'0' }}");
+    }
+    {% endfor %}
+
+    {% for expense in expenses %}
+    {
+        let dateStr = "{{ expense.date|date:'Y-m-d' }}";
+        if (!timelineData[dateStr]) { timelineData[dateStr] = { income: 0, expense: 0 }; }
+        timelineData[dateStr].expense += parseFloat("{{ expense.amount|default:'0' }}");
+    }
+    {% endfor %}
+
+    const sortedDates = Object.keys(timelineData).sort();
+    const incomeLineData = sortedDates.map(date => timelineData[date].income);
+    const expenseLineData = sortedDates.map(date => timelineData[date].expense);
+
+    const ctxMain = document.getElementById('reportBarChart');
+    if (ctxMain) {
+        new Chart(ctxMain, {
+            type: 'bar',
+            data: {
+                labels: sortedDates,
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeLineData,
+                        backgroundColor: '#00f5d4', // Neon Cyan
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Expense',
+                        data: expenseLineData,
+                        backgroundColor: '#ef476f', // Neon Red/Pink
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: Object.assign({}, commonOptions, {
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: { color: '#94A3B8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: { color: '#94A3B8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                }
+            })
+        });
+    }
+
+    // Prepare breakdown data
+    const incomeRaw = [
+        {% for income in incomes %}
+        { label: "{{ income.source|escapejs }}", amount: parseFloat({{ income.amount|default:"0" }}) },
+        {% endfor %}
+    ];
+    
+    const expenseRaw = [
+        {% for expense in expenses %}
+        { label: "{{ expense.category|escapejs }}", amount: parseFloat({{ expense.amount|default:"0" }}) },
+        {% endfor %}
+    ];
+
+    const aggregateData = (arr) => {
+        const agg = {};
+        arr.forEach(item => {
+            agg[item.label] = (agg[item.label] || 0) + item.amount;
+        });
+        return {
+            labels: Object.keys(agg),
+            data: Object.values(agg)
+        };
+    };
+
+    const incomeAgg = aggregateData(incomeRaw);
+    const expenseAgg = aggregateData(expenseRaw);
+
+    // 2. Income Breakdown
+    const ctxInc = document.getElementById('incomePieChart');
+    if (ctxInc && incomeAgg.labels.length > 0) {
+        new Chart(ctxInc, {
+            type: 'pie',
+            data: {
+                labels: incomeAgg.labels,
+                datasets: [{
+                    data: incomeAgg.data,
+                    backgroundColor: colorPalette.slice(0, incomeAgg.labels.length),
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: commonOptions
+        });
+    }
+
+    // 3. Expense Breakdown
+    const ctxExp = document.getElementById('expensePieChart');
+    if (ctxExp && expenseAgg.labels.length > 0) {
+        new Chart(ctxExp, {
+            type: 'pie',
+            data: {
+                labels: expenseAgg.labels,
+                datasets: [{
+                    data: expenseAgg.data,
+                    backgroundColor: colorPalette.slice(0, expenseAgg.labels.length),
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: commonOptions
+        });
+    }
+});
+</script>
+{% endif %}
+{% endblock js %}
